@@ -1,0 +1,62 @@
+﻿.background-weather {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    background: var(--background-color);
+    overflow: hidden;
+    z-index: -1;
+}
+
+    .background-weather.morning {
+        background: linear-gradient(0deg, rgba(0,5,29,1) 0%, rgba(118,195,255,1) 100%);
+    }
+
+    .background-weather.daylight {
+        background: linear-gradient(0deg, rgb(172 231 255) 0%, rgb(255 255 255) 100%);
+    }
+
+    .background-weather.midnight {
+        background: linear-gradient(0deg, rgba(0,5,29,1) 0%, rgba(23,0,80,1) 100%);
+    }
+
+
+
+
+.background-weather > .cloud {
+    user-select: none;
+    position: absolute;
+    left: -300px;
+    transition-property: left;
+    transition-delay: 0s;
+    transition-timing-function: linear;
+    transition-duration: 10s; /* Will be overwritten by js */
+}
+
+
+
+    .background-weather > .precipitation {
+        width: 8px;
+        /*width: 10px;*/
+        aspect-ratio: 1/1;
+        border-radius: 15px;
+        background-color: red;
+        z-index: -1;
+
+        user-select: none;
+        position: absolute;
+        transition-property: top;
+        transition-delay: 0s;
+        transition-timing-function: linear;
+        transition-duration: 3s; /* Will be overwritten by js */
+    }
+
+        .background-weather > .precipitation.rain {
+            background: blue;
+        }
+
+        .background-weather > .precipitation.snow {
+            background: white;
+        }
+

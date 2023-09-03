@@ -1,0 +1,53 @@
+﻿[role=alert] {
+    background: firebrick;
+    color: white;
+    padding: 1em 2em;
+    box-shadow: 0 5px 0 0 black;
+    border: solid 3px black;
+}
+
+h1, h2 {
+    text-align: center;
+}
+
+h1 {
+    margin-bottom: 5rem;
+    font-size: 2.5rem;
+    text-shadow: 3px 3px #0000f345;
+    padding-bottom: 20px;
+    border-bottom: var(--primary-color) solid 2px;
+}
+
+input, button {
+    outline-offset: 5px;
+    outline-color: var(--secondary-color);
+}
+
+.input-container {
+    padding: 10px 20px;
+    border: solid 1px black;
+    border-radius: 40px;
+    margin: auto;
+    margin-bottom: 5rem;
+    display: flex;
+    max-width: 600px;
+    box-shadow: 0px 4px 0px 0px black;
+    background: white;
+}
+
+.input-container input {
+    flex-grow: 1;
+    border: none;
+    margin-right: 10px;
+
+}
+
+.input-container button {
+    border: none;
+    background: none;
+    color: var(--primary-color);
+    font-size: 1.2rem;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+}

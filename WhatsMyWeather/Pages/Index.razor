@@ -1,0 +1,51 @@
+﻿@page "/"
+@inject HttpClient http;
+@inject IJSRuntime js;
+
+@if (error is not null)
+{
+    <div role="alert">
+        @error
+    </div>
+}
+
+<h1 class="text-primary">Whats my weather?</h1>
+
+<div class="input-container">
+    <input placeholder="Accept the location request to fill-in automatically" @bind="location" type="text" autocomplete="address-level2">
+    <button @onclick="FetchWeather" title="Get weather from location"><i class="fa-solid fa-magnifying-glass"></i></button>
+</div>
+
+
+@code {
+    string location = "";
+
+    string? error;
+
+
+    async Task FetchWeather()
+    {
+
+        // to do
+    }
+
+    [JSInvokable]
+    public void GetLocationErrorCallback()
+    {
+        error = "Something went wrong while trying to automatically get your location!";
+        StateHasChanged();
+    }
+
+    [JSInvokable]
+    public async Task GetLocationCallback(object latitude, object longitude)
+    {
+        location = $"{latitude}, {longitude}";
+        await FetchWeather();
+        StateHasChanged();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await js.InvokeVoidAsync("getLocation", DotNetObjectReference.Create(this));
+    }
+}
