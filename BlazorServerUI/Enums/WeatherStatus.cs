@@ -1,4 +1,4 @@
-﻿namespace WhatsMyWeather.Enums;
+﻿namespace BlazorServerUI.Enums;
 
 public enum WeatherStatus
 {
