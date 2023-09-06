@@ -75,6 +75,7 @@ function generateClouds(optionsObject) {
             // with a random added downwards location for different speeds
             setTimeout(() => {
                 raindrop.style.top = `calc(100% + 500px + ${randomInt(100, 300)}px)`;
+                raindrop.style.opacity = 1;
             }, 100);
 
             setTimeout(() => {
@@ -327,3 +328,6 @@ function setBackgroundWeather(weatherType, timeInHours) {
 
     generateClouds(cloudGenerationOptions);
 }
+
+
+setBackgroundWeather("Rain", 12);

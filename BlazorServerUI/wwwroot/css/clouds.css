@@ -37,8 +37,8 @@
 
 
     .background-weather > .precipitation {
+        opacity: 0;
         width: 8px;
-        /*width: 10px;*/
         aspect-ratio: 1/1;
         border-radius: 15px;
         background-color: red;
@@ -46,10 +46,8 @@
 
         user-select: none;
         position: absolute;
-        transition-property: top;
-        transition-delay: 0s;
-        transition-timing-function: linear;
-        transition-duration: 3s; /* Will be overwritten by js */
+
+        transition: top 3s linear, opacity .5s linear;
     }
 
         .background-weather > .precipitation.rain {

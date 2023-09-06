@@ -11,7 +11,7 @@ builder.Services.AddServerSideBlazor();
 
 builder.Services.AddHttpClient<GetWeatherHelper>(client =>
 {
-    string apiKey = "w1VGICvBWnNFDzS7";
+    string apiKey = "411ecacff37b4ba1a2d101159232306";
     client.BaseAddress = new Uri($"https://api.pirateweather/forecast/{apiKey}/");
 });
 
