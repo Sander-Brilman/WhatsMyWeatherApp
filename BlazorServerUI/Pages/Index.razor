@@ -1,6 +1,9 @@
 ﻿@page "/"
+@using BlazorServerUI.Data.GetWeatherHelperServiceModels;
+@using BlazorServerUI.Services;
 @inject HttpClient http;
 @inject IJSRuntime js;
+@inject GetWeatherHelper weatherHelper
 
 @if (error is not null)
 {
@@ -9,7 +12,7 @@
     </div>
 }
 
-<h1 class="text-primary">Whats my weather?</h1>
+<h1>Wat is mijn weer?</h1>
 
 <div class="input-container">
     <input placeholder="Accept the location request to fill-in automatically" @bind="location" type="text" autocomplete="address-level2">
@@ -25,14 +28,34 @@
 
     async Task FetchWeather()
     {
+        try
+        {
+            var result = await weatherHelper.GetWeatherStatusForLocationAsync(location);
 
+            await SetWeather(result.currently);
+        }
+        catch (Exception ex)
+        {
+            error = "Er is iets mis gegaan bij het ophalen van het weer!";
+
+            #if DEBUG
+            error += " => " + ex.Message;
+            #endif
+        }
         // to do
+    }
+
+
+    public async Task SetWeather(WeatherGenerationOptions options)
+    {
+        await js.InvokeVoidAsync("setBackgroundWeather", options);
     }
 
     [JSInvokable]
     public void GetLocationErrorCallback()
     {
         error = "Something went wrong while trying to automatically get your location!";
+
         StateHasChanged();
     }
 
@@ -46,6 +69,12 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        DateTimeOffset currentTime = DateTimeOffset.Now.ToOffset(TimeSpan.FromHours(2));
+
+        if (firstRender)
+        {
+            await js.InvokeVoidAsync("setBackground", currentTime.GetBackgroundFromTime().ToString());
+        }
         await js.InvokeVoidAsync("getLocation", DotNetObjectReference.Create(this));
     }
 }

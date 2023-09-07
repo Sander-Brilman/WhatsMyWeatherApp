@@ -1,6 +1,4 @@
 using BlazorServerUI.Services;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,11 +6,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 
-
+builder.Services.AddScoped<GetWeatherHelper>();
 builder.Services.AddHttpClient<GetWeatherHelper>(client =>
 {
-    string apiKey = "411ecacff37b4ba1a2d101159232306";
-    client.BaseAddress = new Uri($"https://api.pirateweather/forecast/{apiKey}/");
+    client.BaseAddress = new Uri("https://api.weatherapi.com/v1/");
 });
 
 

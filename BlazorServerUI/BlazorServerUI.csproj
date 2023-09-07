@@ -14,4 +14,8 @@
     <None Include="wwwroot\js\clouds.js" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="System.Net.Http.Json" Version="7.0.1" />
+  </ItemGroup>
+
 </Project>

@@ -1,4 +1,4 @@
-﻿.background-weather {
+﻿#background-weather {
     position: absolute;
     left: 0;
     top: 0;
@@ -9,22 +9,25 @@
     z-index: -1;
 }
 
-    .background-weather.morning {
+    #background-weather.morning {
         background: linear-gradient(0deg, rgba(0,5,29,1) 0%, rgba(118,195,255,1) 100%);
     }
 
-    .background-weather.daylight {
-        background: linear-gradient(0deg, rgb(172 231 255) 0%, rgb(255 255 255) 100%);
+    #background-weather.daylight {
+        background: linear-gradient(0deg, rgb(255, 255, 255) 0%, rgb(80, 189, 255) 100%);
     }
 
-    .background-weather.midnight {
+    #background-weather.midnight {
         background: linear-gradient(0deg, rgba(0,5,29,1) 0%, rgba(23,0,80,1) 100%);
     }
 
+    #background-weather.darkdaylight {
+        background: linear-gradient(0deg, rgb(43, 43, 43) 0%, rgb(43, 78, 100) 100%);
+    }
 
 
 
-.background-weather > .cloud {
+#background-weather > .cloud {
     user-select: none;
     position: absolute;
     left: -300px;
@@ -36,7 +39,7 @@
 
 
 
-    .background-weather > .precipitation {
+    #background-weather > .precipitation {
         opacity: 0;
         width: 8px;
         aspect-ratio: 1/1;
@@ -50,11 +53,30 @@
         transition: top 3s linear, opacity .5s linear;
     }
 
-        .background-weather > .precipitation.rain {
-            background: blue;
+        #background-weather > .precipitation.rain {
+            background: #0051c2;
         }
 
-        .background-weather > .precipitation.snow {
+        #background-weather > .precipitation.snow {
             background: white;
         }
 
+
+    #background-weather > .flash,
+    #background-weather > .thunder {
+        position: absolute;
+        transition: opacity .7s linear;
+    }
+
+    #background-weather > .thunder {
+        left: 50%;
+        top: 50%;
+        z-index: -1;
+    }
+
+        #background-weather > .flash {
+            inset: 0 0 0 0;
+            z-index: 1;
+            transition-duration: .5s;
+            background: #ffffffb2;
+        }
