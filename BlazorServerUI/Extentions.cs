@@ -4,17 +4,26 @@ namespace BlazorServerUI;
 
 public static class Extentions
 {
-    public static WeatherBackground GetBackgroundFromTime(this DateTimeOffset time, bool cloudyIfDay = false)
+    public static TimeOfDay GetTimeOfDay(this DateTimeOffset localtime, DateTimeOffset sunrise, DateTimeOffset sunset, TimeSpan sunriseAndSunsetDuration)
     {
-        if (time.Hour >= 5 && time.Hour <= 9)
-        {
-            return WeatherBackground.morning;
-        }
-        else if (time.Hour >= 10 && time.Hour <= 18)
-        {
-            return cloudyIfDay ? WeatherBackground.darkdaylight : WeatherBackground.daylight;
-        }
+        return
+            localtime > sunrise && localtime < sunset
+                ? localtime < sunrise.Add(sunriseAndSunsetDuration)
+                    ? TimeOfDay.Sunrize
+                    : localtime > sunset.Subtract(sunriseAndSunsetDuration)
+                        ? TimeOfDay.Sunset
+                        : TimeOfDay.Day
+                : TimeOfDay.Night;
+    }
 
-        return WeatherBackground.midnight;
+    public static string ToCssClass(this TimeOfDay timeOfDay, bool setDaylightToDark = false)
+    {
+        return (timeOfDay switch
+        {
+            TimeOfDay.Night => WeatherBackgroundCSSClass.Night,
+            TimeOfDay.Sunrize => WeatherBackgroundCSSClass.Sunrize,
+            TimeOfDay.Day => setDaylightToDark ? WeatherBackgroundCSSClass.DarkDay : WeatherBackgroundCSSClass.Day,
+            TimeOfDay.Sunset => WeatherBackgroundCSSClass.Sunset,
+        }).ToString();
     }
 }

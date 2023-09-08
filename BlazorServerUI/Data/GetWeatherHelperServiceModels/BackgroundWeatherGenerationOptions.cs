@@ -2,7 +2,7 @@
 
 namespace BlazorServerUI.Data.GetWeatherHelperServiceModels;
 
-public class WeatherGenerationOptions
+public class BackgroundWeatherGenerationOptions
 {
 
     /// <summary>
@@ -32,5 +32,5 @@ public class WeatherGenerationOptions
     public double PrecipitationSpawnIntervalInSeconds { get; set; }
     public bool Thunder { get; set; } = false;
 
-    public required WeatherBackground Background { get; set; }
+    public required string BackgroundCssClass { get; set; }
 }

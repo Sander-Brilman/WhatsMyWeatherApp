@@ -1,5 +1,7 @@
 ﻿using BlazorServerUI.Data.GetWeatherHelperServiceModels;
 using BlazorServerUI.Data.RawWeatherApiModels;
+using BlazorServerUI.Enums;
+using Microsoft.AspNetCore.Components.Server.Circuits;
 using Microsoft.AspNetCore.Mvc.Razor;
 using System.Web;
 
@@ -17,35 +19,63 @@ public class GetWeatherHelper
 
 
 
-    public async Task<(WeatherGenerationOptions currently, WeatherGenerationOptions[] hourly)> GetWeatherStatusForLocationAsync(string location)
+    public async Task<WeatherResult> GetWeatherStatusForLocationAsync(string location)
     {
         string uri = $"forecast.json?q={HttpUtility.UrlEncode(location)}&days=1&key=411ecacff37b4ba1a2d101159232306&lang=nl";
-
-
-        WeatherRootObject? apiResponse = await _httpClient.GetFromJsonAsync<WeatherRootObject>(uri);
+        WeahterApiRootobject? apiResponse = await _httpClient.GetFromJsonAsync<WeahterApiRootobject>(uri);
+        
 
         if (apiResponse is null)
         {
-            throw new Exception("APi response is null");
+            throw new Exception("APi response is (partly) null");
         }
 
-        DateTimeOffset time = DateTimeOffset.Parse(apiResponse.location.localtime);
 
-        WeatherGenerationOptions currentWeather = GenerateWeatherOptionsFromWeatherCode(
-            apiResponse.current.condition.code,
-            time
-        );
 
-        WeatherGenerationOptions[] hourlyWeather = apiResponse.forecast.forecastday.First().hours
-            .Select(x => {
-                return GenerateWeatherOptionsFromWeatherCode(x.condition.code, DateTimeOffset.Parse(x.time));
-            })
-            .ToArray();
 
-        return (currentWeather, hourlyWeather);
+        // there is only 1 :skull:
+        Forecastday forecastday = apiResponse.forecast.forecastday.First();
+
+
+        DateTimeOffset localtime = DateTimeOffset.Parse(apiResponse.location.localtime);
+
+        DateTimeOffset sunrise = DateTimeOffset.Parse(forecastday.astro.sunrise);
+        DateTimeOffset sunset = DateTimeOffset.Parse(forecastday.astro.sunset);
+
+        TimeSpan sunriseAndSetDuration = TimeSpan.FromMinutes(30);
+
+        TimeOfDay timeOfDay = localtime.GetTimeOfDay(sunrise, sunset, sunriseAndSetDuration);
+
+
+
+        return new WeatherResult()
+        {
+            Sunrize = sunrise,
+            Sunset = sunset,
+            SunsetAndSunrizeDuration = sunriseAndSetDuration,
+            LocalTime = localtime,
+
+            Location = $"{apiResponse.location.name}, {apiResponse.location.region} {apiResponse.location.country}",
+
+            CurrentWeather = new WeatherState()
+            {
+                WeatherGenerationOptions = GenerateWeatherOptionsFromWeatherCode(apiResponse.current.condition.code, timeOfDay),
+                Status = apiResponse.current.condition.text,
+                AverageTempInCelcius = apiResponse.current.temp_c
+            },
+
+            HourlyWeather = forecastday.hour
+                    .Select(x => new WeatherState()
+                    {
+                        WeatherGenerationOptions = GenerateWeatherOptionsFromWeatherCode(x.condition.code, timeOfDay),
+                        Status = x.condition.text,
+                        AverageTempInCelcius = x.temp_c
+                    })
+                    .ToArray()
+        };
     }
 
-    private static WeatherGenerationOptions GenerateWeatherOptionsFromWeatherCode(int weatherCode, DateTimeOffset time)
+    private static BackgroundWeatherGenerationOptions GenerateWeatherOptionsFromWeatherCode(int weatherCode, TimeOfDay timeOfDay)
     {
         switch (weatherCode)
         {
@@ -68,7 +98,7 @@ public class GetWeatherHelper
                     MaxCloudOpacity = 65,
                     MinCloudOpacity = 50,
 
-                    Background = time.GetBackgroundFromTime(),
+                    BackgroundCssClass = timeOfDay.ToCssClass(),
                 };
 
 
@@ -92,7 +122,7 @@ public class GetWeatherHelper
                     MaxCloudOpacity = 65,
                     MinCloudOpacity = 50,
 
-                    Background = time.GetBackgroundFromTime(true),
+                    BackgroundCssClass = timeOfDay.ToCssClass(),
                 };
 
 
@@ -129,7 +159,7 @@ public class GetWeatherHelper
                     PrecipitationSpawnIntervalInSeconds = 0.7,
                     Thunder = weatherCode == 1276, // Moderate or heavy rain with thunder
 
-                    Background = time.GetBackgroundFromTime(true),
+                    BackgroundCssClass = timeOfDay.ToCssClass(true),
                 };
 
 
@@ -165,7 +195,7 @@ public class GetWeatherHelper
                     PrecipitationSpawnIntervalInSeconds = 1.4,
                     Thunder = weatherCode == 1273, // Patchy light rain with thunder
 
-                    Background = time.GetBackgroundFromTime(),
+                    BackgroundCssClass = timeOfDay.ToCssClass(),
                 };
 
 
@@ -206,7 +236,7 @@ public class GetWeatherHelper
                     PrecipitationSpawnIntervalInSeconds = 0.7,
                     Thunder = weatherCode == 1282, // Moderate or heavy snow with thunder
 
-                    Background = time.GetBackgroundFromTime(true),
+                    BackgroundCssClass = timeOfDay.ToCssClass(true),
                 };
 
 
@@ -237,7 +267,7 @@ public class GetWeatherHelper
                     PrecipitationSpawnIntervalInSeconds = 1.4,
                     Thunder = weatherCode == 1279, // Patchy light snow with thunder
 
-                    Background = time.GetBackgroundFromTime(),
+                    BackgroundCssClass = timeOfDay.ToCssClass(true),
                 };
 
 
@@ -262,7 +292,7 @@ public class GetWeatherHelper
                     MaxCloudOpacity = 40,
                     MinCloudOpacity = 30,
 
-                    Background = time.GetBackgroundFromTime(),
+                    BackgroundCssClass = timeOfDay.ToCssClass(),
                 };
 
 
@@ -286,7 +316,7 @@ public class GetWeatherHelper
                     MinCloudOpacity = 90,
                     Thunder = true,
 
-                    Background = time.GetBackgroundFromTime(true),
+                    BackgroundCssClass = timeOfDay.ToCssClass(true),
                 };
 
 
@@ -295,7 +325,7 @@ public class GetWeatherHelper
             default:
                 return new()
                 {
-                    CloudGenerationFactor = 320,
+                    CloudGenerationFactor = 500,
                     TimeBetweenCloudSpawnInMiliseconds = 5000,
 
                     MaxCloudSpeedInPixelsPerSecond = 90,
@@ -310,10 +340,8 @@ public class GetWeatherHelper
                     MaxCloudOpacity = 65,
                     MinCloudOpacity = 50,
 
-                    Background = time.GetBackgroundFromTime(),
+                    BackgroundCssClass = timeOfDay.ToCssClass(),
                 };
         }
     }
-
-
 }

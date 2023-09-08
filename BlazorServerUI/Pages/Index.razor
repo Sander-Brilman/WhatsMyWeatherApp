@@ -1,80 +1,37 @@
-﻿@page "/"
-@using BlazorServerUI.Data.GetWeatherHelperServiceModels;
-@using BlazorServerUI.Services;
-@inject HttpClient http;
-@inject IJSRuntime js;
-@inject GetWeatherHelper weatherHelper
+﻿@page "/" @using BlazorServerUI.Data.GetWeatherHelperServiceModels; @using BlazorServerUI.Services; @using System.ComponentModel.DataAnnotations;
+@inject HttpClient http; @inject IJSRuntime js; @inject GetWeatherHelper weatherHelper  @if (error is not null) {     <div role="alert">         @error     </div> }  <h1>Wat is mijn weer?</h1>  <EditForm Model="location" OnValidSubmit="FetchWeather" >
+    <div class="input-container">
+        <input placeholder="Accept the location request to fill-in automatically" @bind="location.Location" type="text" autocomplete="address-level2">         <button type="submit" title="Get weather from location"><i class="fa-solid fa-magnifying-glass"></i></button>     </div> </EditForm>  
+<h3>@currentWeather?.Status</h3>
+ @code {
 
-@if (error is not null)
-{
-    <div role="alert">
-        @error
-    </div>
-}
+    class InputLocation
+    {
+        [Required(ErrorMessage = "Je moet dit wel invullen hè!")]
+        public string Location { get; set; } = "";
+    }
 
-<h1>Wat is mijn weer?</h1>
-
-<div class="input-container">
-    <input placeholder="Accept the location request to fill-in automatically" @bind="location" type="text" autocomplete="address-level2">
-    <button @onclick="FetchWeather" title="Get weather from location"><i class="fa-solid fa-magnifying-glass"></i></button>
-</div>
-
-
-@code {
-    string location = "";
+    InputLocation location = new();
 
     string? error;
 
+    WeatherState? currentWeather;
 
-    async Task FetchWeather()
-    {
-        try
+    WeatherState[] predictionWeather = Array.Empty<WeatherState>();
+
+
+    async Task FetchWeather()     {         try         {             WeatherResult result = await weatherHelper.GetWeatherStatusForLocationAsync(location.Location);
+
+            currentWeather = result.CurrentWeather;
+            predictionWeather = result.HourlyWeather;
+
+            location.Location = result.Location;
+
+            await SetWeather(result.CurrentWeather.WeatherGenerationOptions);
+        }         catch (Exception ex)         {             error = "Er is iets mis gegaan bij het ophalen van het weer!";              #if DEBUG     error += " => " + ex.Message;             #endif         }         // to do     }       public async Task SetWeather(BackgroundWeatherGenerationOptions options)     {         //await js.InvokeVoidAsync("setBackgroundWeather", options);     }      [JSInvokable]     public void GetLocationErrorCallback()     {         error = "Something went wrong while trying to automatically get your location!";          StateHasChanged();     }      [JSInvokable]     public async Task GetLocationCallback(object latitude, object longitude)     {         location.Location = $"{latitude}, {longitude}";         await FetchWeather();         StateHasChanged();     }      protected override async Task OnAfterRenderAsync(bool firstRender)     {
+        if (firstRender is false)
         {
-            var result = await weatherHelper.GetWeatherStatusForLocationAsync(location);
-
-            await SetWeather(result.currently);
+            return;
         }
-        catch (Exception ex)
-        {
-            error = "Er is iets mis gegaan bij het ophalen van het weer!";
 
-            #if DEBUG
-            error += " => " + ex.Message;
-            #endif
-        }
-        // to do
-    }
-
-
-    public async Task SetWeather(WeatherGenerationOptions options)
-    {
-        await js.InvokeVoidAsync("setBackgroundWeather", options);
-    }
-
-    [JSInvokable]
-    public void GetLocationErrorCallback()
-    {
-        error = "Something went wrong while trying to automatically get your location!";
-
-        StateHasChanged();
-    }
-
-    [JSInvokable]
-    public async Task GetLocationCallback(object latitude, object longitude)
-    {
-        location = $"{latitude}, {longitude}";
-        await FetchWeather();
-        StateHasChanged();
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        DateTimeOffset currentTime = DateTimeOffset.Now.ToOffset(TimeSpan.FromHours(2));
-
-        if (firstRender)
-        {
-            await js.InvokeVoidAsync("setBackground", currentTime.GetBackgroundFromTime().ToString());
-        }
-        await js.InvokeVoidAsync("getLocation", DotNetObjectReference.Create(this));
-    }
-}
+        DateTimeOffset currentTime = DateTimeOffset.Now.ToOffset(TimeSpan.FromHours(2));          await js.InvokeVoidAsync("getLocation", DotNetObjectReference.Create(this));     } }

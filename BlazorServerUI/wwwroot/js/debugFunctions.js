@@ -2,215 +2,241 @@
 
 const setWeatherTo_Partly_Cloudly = () => {
     setBackgroundWeather({
-        CloudGenerationFactor:  100,
-        TimeBetweenCloudSpawnInMiliseconds:  2000,
+        cloudGenerationFactor:  100,
+        timeBetweenCloudSpawnInMiliseconds:  2000,
 
-        MaxCloudSpeedInPixelsPerSecond:  70,
-        MinCloudSpeedInPixelsPerSecond:  40,
+        maxCloudSpeedInPixelsPerSecond:  70,
+        minCloudSpeedInPixelsPerSecond:  40,
+        
+        maxCloudElevationInPixels:  300,
+        minCloudElevationInPixels:  160,
+        
+        maxCloudScale:  50,
+        minCloudScale:  40,
+        
+        maxCloudOpacity: 65,
+        minCloudOpacity: 50,
 
-        MaxCloudElevationInPixels:  300,
-        MinCloudElevationInPixels:  160,
-
-        MaxCloudScale:  50,
-        MinCloudScale:  40,
-
-        MaxCloudOpacity: 65,
-        MinCloudOpacity: 50,
-
-        Background:  "daylight"
+        backgroundCssClass:  "Day"
     })
 };
 
 
 const setWeatherTo_Cloudy = () => {
     setBackgroundWeather({
-        CloudGenerationFactor:  40,
-        TimeBetweenCloudSpawnInMiliseconds:  1000,
+        cloudGenerationFactor:  40,
+        timeBetweenCloudSpawnInMiliseconds:  1000,
 
-        MaxCloudSpeedInPixelsPerSecond:  70,
-        MinCloudSpeedInPixelsPerSecond:  40,
+        maxCloudSpeedInPixelsPerSecond:  70,
+        minCloudSpeedInPixelsPerSecond:  40,
+        
+        maxCloudElevationInPixels:  300,
+        minCloudElevationInPixels:  160,
+        
+        maxCloudScale:  50,
+        minCloudScale:  40,
+        
+        maxCloudOpacity:  65,
+        minCloudOpacity:  50,
 
-        MaxCloudElevationInPixels:  300,
-        MinCloudElevationInPixels:  160,
-
-        MaxCloudScale:  50,
-        MinCloudScale:  40,
-
-        MaxCloudOpacity:  65,
-        MinCloudOpacity:  50,
-
-        Background:  "daylight",
+        backgroundCssClass: "Day"
     })
 };
 
 
 const setWeatherTo_Rain = () => {
     setBackgroundWeather({
-        CloudGenerationFactor:  40,
-        TimeBetweenCloudSpawnInMiliseconds:  1000,
+        cloudGenerationFactor:  40,
+        timeBetweenCloudSpawnInMiliseconds:  1000,
 
-        MaxCloudSpeedInPixelsPerSecond:  70,
-        MinCloudSpeedInPixelsPerSecond:  40,
+        maxCloudSpeedInPixelsPerSecond:  70,
+        minCloudSpeedInPixelsPerSecond:  40,
+        
+        maxCloudElevationInPixels:  225,
+        minCloudElevationInPixels:  175,
+        
+        maxCloudScale:  60,
+        minCloudScale:  50,
+        
+        maxCloudOpacity: 100,
+        minCloudOpacity: 75,
 
-        MaxCloudElevationInPixels:  225,
-        MinCloudElevationInPixels:  175,
+        typeOfPrecipitation: "rain",
+        precipitationSpawnIntervalInSeconds:  0.7,
+        thunder: false, // Moderate or heavy rain with thunder
 
-        MaxCloudScale:  60,
-        MinCloudScale:  50,
-
-        MaxCloudOpacity: 100,
-        MinCloudOpacity: 75,
-
-        TypeOfPrecipitation: "rain",
-        PrecipitationSpawnIntervalInSeconds:  0.7,
-        Thunder: false, // Moderate or heavy rain with thunder
-
-        Background:  "daylight",
+        backgroundCssClass: "Day"
     })
 };
 
 
+
+const setWeatherTo_Rain_with_thunder = () => {
+    setBackgroundWeather({
+        cloudGenerationFactor: 40,
+        timeBetweenCloudSpawnInMiliseconds: 1000,
+
+        maxCloudSpeedInPixelsPerSecond: 70,
+        minCloudSpeedInPixelsPerSecond: 40,
+
+        maxCloudElevationInPixels: 225,
+        minCloudElevationInPixels: 175,
+
+        maxCloudScale: 60,
+        minCloudScale: 50,
+
+        maxCloudOpacity: 100,
+        minCloudOpacity: 75,
+
+        typeOfPrecipitation: "rain",
+        precipitationSpawnIntervalInSeconds: 0.7,
+        thunder: true, // Moderate or heavy rain with thunder
+
+        backgroundCssClass: "DarkDay"
+    })
+};
+
 const setWeatherTo_Light_Rain = () => {
     setBackgroundWeather({
-        CloudGenerationFactor:  40,
-        TimeBetweenCloudSpawnInMiliseconds:  1000,
+        cloudGenerationFactor:  40,
+        timeBetweenCloudSpawnInMiliseconds:  1000,
 
-        MaxCloudSpeedInPixelsPerSecond:  70,
-        MinCloudSpeedInPixelsPerSecond:  40,
+        maxCloudSpeedInPixelsPerSecond:  70,
+        minCloudSpeedInPixelsPerSecond:  40,
+        
+        maxCloudElevationInPixels:  225,
+        minCloudElevationInPixels:  175,
+        
+        maxCloudScale:  60,
+        minCloudScale:  50,
+        
+        maxCloudOpacity: 100,
+        minCloudOpacity: 75,
 
-        MaxCloudElevationInPixels:  225,
-        MinCloudElevationInPixels:  175,
+        typeOfPrecipitation: "rain",
+        precipitationSpawnIntervalInSeconds:  1.4,
+        thunder: false, // Patchy light rain with thunder
 
-        MaxCloudScale:  60,
-        MinCloudScale:  50,
-
-        MaxCloudOpacity: 100,
-        MinCloudOpacity: 75,
-
-        TypeOfPrecipitation: "rain",
-        PrecipitationSpawnIntervalInSeconds:  1.4,
-        Thunder: false, // Patchy light rain with thunder
-
-        Background:  "daylight"
+        backgroundCssClass: "Day"
     })
 };
 
 
 const setWeatherTo_Snow = () => {
     setBackgroundWeather({
-        CloudGenerationFactor:  40,
-        TimeBetweenCloudSpawnInMiliseconds:  1000,
+        cloudGenerationFactor:  40,
+        timeBetweenCloudSpawnInMiliseconds:  1000,
 
-        MaxCloudSpeedInPixelsPerSecond:  70,
-        MinCloudSpeedInPixelsPerSecond:  50,
+        maxCloudSpeedInPixelsPerSecond:  70,
+        minCloudSpeedInPixelsPerSecond:  50,
+        
+        maxCloudElevationInPixels:  225,
+        minCloudElevationInPixels:  175,
+        
+        maxCloudScale:  60,
+        minCloudScale:  50,
+        
+        maxCloudOpacity:  100,
+        minCloudOpacity:  75,
 
-        MaxCloudElevationInPixels:  225,
-        MinCloudElevationInPixels:  175,
+        typeOfPrecipitation: "snow",
+        precipitationSpawnIntervalInSeconds:  0.7,
+        thunder: false, // Moderate or heavy snow with thunder
 
-        MaxCloudScale:  60,
-        MinCloudScale:  50,
-
-        MaxCloudOpacity:  100,
-        MinCloudOpacity:  75,
-
-        TypeOfPrecipitation: "snow",
-        PrecipitationSpawnIntervalInSeconds:  0.7,
-        Thunder: false, // Moderate or heavy snow with thunder
-
-        Background:  "daylight",
+        backgroundCssClass: "DarkDay"
     })
 };
 
 
 const setWeatherTo_Light_Snow = () => {
     setBackgroundWeather({
-        CloudGenerationFactor:  40,
-        TimeBetweenCloudSpawnInMiliseconds:  1000,
+        cloudGenerationFactor:  40,
+        timeBetweenCloudSpawnInMiliseconds:  1000,
 
-        MaxCloudSpeedInPixelsPerSecond:  70,
-        MinCloudSpeedInPixelsPerSecond:  40,
+        maxCloudSpeedInPixelsPerSecond:  70,
+        minCloudSpeedInPixelsPerSecond:  40,
+        
+        maxCloudElevationInPixels:  225,
+        minCloudElevationInPixels:  175,
+        
+        maxCloudScale:  60,
+        minCloudScale:  50,
+        
+        maxCloudOpacity:  100,
+        minCloudOpacity:  75,
 
-        MaxCloudElevationInPixels:  225,
-        MinCloudElevationInPixels:  175,
+        typeOfPrecipitation: "snow",
+        precipitationSpawnIntervalInSeconds:  1.4,
+        thunder:  false, // Patchy light snow with thunder
 
-        MaxCloudScale:  60,
-        MinCloudScale:  50,
-
-        MaxCloudOpacity:  100,
-        MinCloudOpacity:  75,
-
-        TypeOfPrecipitation: "snow",
-        PrecipitationSpawnIntervalInSeconds:  1.4,
-        Thunder:  false, // Patchy light snow with thunder
-
-        Background:  "daylight"
+        backgroundCssClass: "DarkDay"
     })
 };
 
 
 const setWeatherTo_Fog = () => {
     setBackgroundWeather({
-        CloudGenerationFactor:  50,
-        TimeBetweenCloudSpawnInMiliseconds:  3000,
+        cloudGenerationFactor:  50,
+        timeBetweenCloudSpawnInMiliseconds:  3000,
 
-        MaxCloudSpeedInPixelsPerSecond:  25,
-        MinCloudSpeedInPixelsPerSecond:  20,
+        maxCloudSpeedInPixelsPerSecond:  25,
+        minCloudSpeedInPixelsPerSecond:  20,
 
-        MaxCloudElevationInPixels:  20,
-        MinCloudElevationInPixels:  -40,
+        maxCloudElevationInPixels:  20,
+        minCloudElevationInPixels:  -40,
 
-        MaxCloudScale:  75,
-        MinCloudScale:  55,
+        maxCloudScale:  75,
+        minCloudScale:  55,
 
-        MaxCloudOpacity:  40,
-        MinCloudOpacity:  30,
+        maxCloudOpacity:  40,
+        minCloudOpacity:  30,
 
-        Background:  "daylight"
+        backgroundCssClass: "Day"
     });
 };
 
 
 const setWeatherTo_Thunder = () => {
     setBackgroundWeather({
-        CloudGenerationFactor:  40,
-        TimeBetweenCloudSpawnInMiliseconds:  1000,
+        cloudGenerationFactor:  40,
+        timeBetweenCloudSpawnInMiliseconds:  1000,
 
-        MaxCloudSpeedInPixelsPerSecond:  70,
-        MinCloudSpeedInPixelsPerSecond:  40,
+        maxCloudSpeedInPixelsPerSecond:  70,
+        minCloudSpeedInPixelsPerSecond:  40,
 
-        MaxCloudElevationInPixels:  300,
-        MinCloudElevationInPixels:  160,
+        maxCloudElevationInPixels:  300,
+        minCloudElevationInPixels:  160,
 
-        MaxCloudScale:  85,
-        MinCloudScale:  70,
+        maxCloudScale:  85,
+        minCloudScale:  70,
 
-        MaxCloudOpacity:  99,
-        MinCloudOpacity:  90,
-        Thunder:  true,
+        maxCloudOpacity:  99,
+        minCloudOpacity:  90,
+        thunder:  true,
 
-        Background:  "darkdaylight",
+        backgroundCssClass: "DarkDay"
     })
 };
 
 
 const setWeatherTo_Nothin = () => {
     setBackgroundWeather({
-        CloudGenerationFactor:  320,
-        TimeBetweenCloudSpawnInMiliseconds:  5000,
+        cloudGenerationFactor:  320,
+        timeBetweenCloudSpawnInMiliseconds:  5000,
 
-        MaxCloudSpeedInPixelsPerSecond:  90,
-        MinCloudSpeedInPixelsPerSecond:  65,
+        maxCloudSpeedInPixelsPerSecond:  90,
+        minCloudSpeedInPixelsPerSecond:  65,
+        
+        maxCloudElevationInPixels:  350,
+        minCloudElevationInPixels:  100,
+        
+        maxCloudScale:  55,
+        minCloudScale:  35,
+        
+        maxCloudOpacity:  65,
+        minCloudOpacity:  50,
 
-        MaxCloudElevationInPixels:  350,
-        MinCloudElevationInPixels:  100,
-
-        MaxCloudScale:  55,
-        MinCloudScale:  35,
-
-        MaxCloudOpacity:  65,
-        MinCloudOpacity:  50,
-
-        Background:  "daylight"
+        backgroundCssClass: "Day"
     })
 };
 

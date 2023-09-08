@@ -9,33 +9,37 @@
     z-index: -1;
 }
 
-    #background-weather.morning {
+    #background-weather.Sunrize {
         background: linear-gradient(0deg, rgba(0,5,29,1) 0%, rgba(118,195,255,1) 100%);
     }
 
-    #background-weather.daylight {
+    #background-weather.Day {
         background: linear-gradient(0deg, rgb(255, 255, 255) 0%, rgb(80, 189, 255) 100%);
     }
 
-    #background-weather.midnight {
-        background: linear-gradient(0deg, rgba(0,5,29,1) 0%, rgba(23,0,80,1) 100%);
-    }
-
-    #background-weather.darkdaylight {
+    #background-weather.DarkDay {
         background: linear-gradient(0deg, rgb(43, 43, 43) 0%, rgb(43, 78, 100) 100%);
     }
 
+    #background-weather.Sunset {
+        background: linear-gradient(0deg, rgba(0,5,29,1) 0%, rgba(23,0,80,1) 100%);
+    }
+
+    #background-weather.Night {
+        background: linear-gradient(0deg, rgba(0,5,29,1) 0%, rgba(23,0,80,1) 100%);
+    }
 
 
-#background-weather > .cloud {
-    user-select: none;
-    position: absolute;
-    left: -300px;
-    transition-property: left;
-    transition-delay: 0s;
-    transition-timing-function: linear;
-    transition-duration: 10s; /* Will be overwritten by js */
-}
+
+    #background-weather > .cloud {
+        user-select: none;
+        position: absolute;
+        left: -300px;
+        transition-property: left;
+        transition-delay: 0s;
+        transition-timing-function: linear;
+        transition-duration: 10s; /* Will be overwritten by js */
+    }
 
 
 
