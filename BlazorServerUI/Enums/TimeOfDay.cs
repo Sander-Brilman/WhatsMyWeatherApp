@@ -3,7 +3,7 @@
 public enum TimeOfDay
 {
     Night,
-    Sunrize,
+    Sunrise,
     Day,
     Sunset,
 }

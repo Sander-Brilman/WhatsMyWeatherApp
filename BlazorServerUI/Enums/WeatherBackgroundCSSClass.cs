@@ -4,7 +4,7 @@
 // represent the classes in clouds.css
 public enum WeatherBackgroundCSSClass
 {
-    Sunrize,
+    Sunrise,
     Day,
     DarkDay,
     Sunset,

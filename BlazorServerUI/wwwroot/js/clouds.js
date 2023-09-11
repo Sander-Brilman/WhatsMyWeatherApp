@@ -8,6 +8,7 @@ const backgroundWeatherContainer = document.querySelector('#background-weather')
 const activeClouds = [];
 const cloudsInCue = [];
 
+
 let cloudSpawnInterval = 0;
 
 
@@ -46,6 +47,12 @@ function spawnCloudFromCloudObject(cloudObject) {
     const enableThunder = cloudObject.options.thunder
 
 
+    // populate object
+    cloudObject.AllTimeouts = []
+    cloudObject.AllIntervals = [];
+    cloudObject.AllElements = [];
+
+
 
     //
     // functions
@@ -60,14 +67,18 @@ function spawnCloudFromCloudObject(cloudObject) {
     const randomScale = () => randomInt(minCloudScale, maxCloudScale) / 100;
 
     const setCreateThunderTimeout = (cloud, timeoutDurationInMiliSeconds) => {
-        timeout = timeoutDurationInMiliSeconds
+        timeout = timeoutDurationInMiliSeconds;
 
         return setTimeout(() => {
 
             console.log('thunder baby')
 
             let flashOverlay = document.createElement('div');
-            flashOverlay.classList.add('flash');
+            flashOverlay.classList.add('flash', 'overlay');
+
+            // add element to list of cloud-associated elements
+            cloudObject.AllElements.push(flashOverlay);
+
 
             let thunderElement = document.createElement('div');
             thunderElement.classList.add('thunder');
@@ -76,11 +87,14 @@ function spawnCloudFromCloudObject(cloudObject) {
             thunderElement.style.top = `${cloud.offsetTop + (cloud.offsetHeight / 2)}px`;
             thunderElement.style.left = `${cloud.offsetLeft + (cloud.offsetWidth / 2)}px`;
 
+            // add element to list of cloud-associated elements
+            cloudObject.AllElements.push(thunderElement);
+
             let isFlipped = randomInt(0, 1);
 
             if (isFlipped) {
                 thunderElement.style.transform = `scaleX(-1) translateX(-100%)`;
-                thunderElement.style.right = `${cloud.offsetLeft + (cloud.offsetWidth / 2)}px`;
+                thunderElement.style.right = `${(backgroundWeatherContainer.offsetWidth - cloud.offsetLeft) + (cloud.offsetWidth / 2)}px`;
             }
 
             backgroundWeatherContainer.appendChild(flashOverlay);
@@ -111,10 +125,13 @@ function spawnCloudFromCloudObject(cloudObject) {
 
         precipitationIntervalSpeed = (precipitationIntensityInSeconds * 1000);
 
-        return setInterval(() => {
+        let interval = setInterval(() => {
 
             const raindrop = document.createElement('div');
             raindrop.classList.add('precipitation', precipitationType);
+
+            // add element to list of cloud-associated elements
+            cloudObject.AllElements.push(raindrop);
 
             raindrop.style.left = `${cloud.offsetLeft + (cloud.offsetWidth / 2)}px`;
             raindrop.style.top = `${cloud.offsetTop + (cloud.offsetHeight / 2)}px`;
@@ -134,6 +151,8 @@ function spawnCloudFromCloudObject(cloudObject) {
 
         }, precipitationIntervalSpeed)
 
+
+        return interval;
     }
 
 
@@ -142,6 +161,8 @@ function spawnCloudFromCloudObject(cloudObject) {
     //
 
     let cloud = document.createElement("div");
+
+    cloudObject.AllElements.push(cloud);
 
     cloud.classList.add('cloud');
     cloud.innerHTML = '<img src="/svg/cloud.svg" alt="decorative cloud" tabindex="-1" >';
@@ -199,12 +220,6 @@ function spawnCloudFromCloudObject(cloudObject) {
 
 
 
-    // populate object
-    cloudObject.AllTimeouts = []
-    cloudObject.AllIntervals = [];
-    cloudObject.AllElements = [cloud]
-
-
     activeClouds.push(cloudObject);
 }
 
@@ -219,12 +234,16 @@ function clearCloudFromObject(cloudObject) {
     // -- 
 
     cloudObject.AllElements.forEach(element => {
-        backgroundWeatherContainer.removeChild(element);
+        // try - catch to prevent script from crashing if element is already removed.
+        try {
+            backgroundWeatherContainer.removeChild(element);
+        } catch { }
     });
 
     cloudObject.AllElements = [];
 
-    // -- 
+    // --
+
 
     cloudObject.AllIntervals.forEach(intervalId => {
         clearInterval(intervalId);
@@ -264,8 +283,8 @@ function generateClouds(dotnetOptionsObject) {
     //
     clearInterval(cloudSpawnInterval);
 
+
     cloudsInCue.forEach(cloudInQue => {
-        console.log('clear cloud from que', cloudInQue);
         clearCloudFromObject(cloudInQue);
     })
 
@@ -278,6 +297,7 @@ function generateClouds(dotnetOptionsObject) {
     })
 
     activeClouds.length = 0;
+
 
 
 
@@ -318,40 +338,29 @@ function setBackgroundWeather(cloudGenerationOptions) {
     generateClouds(cloudGenerationOptions);
 }
 
-function setBackground(backgroundclass) {
+function setBackground(backgroundClass) {
 
-    if (backgroundWeatherContainer.classList.contains(backgroundclass)) {
+    if (backgroundWeatherContainer.classList.contains(backgroundClass)) {
         return;
     }
 
-    console.log('changing background', backgroundWeatherContainer.classList, backgroundclass);
+    let overlayElement = document.createElement("div")
+    overlayElement.classList.add('overlay', 'background-transition', backgroundWeatherContainer.classList.toString());
+
+
+    backgroundWeatherContainer.appendChild(overlayElement);
 
     backgroundWeatherContainer.setAttribute('class', '');
-    backgroundWeatherContainer.classList.add(backgroundclass);
+    backgroundWeatherContainer.classList.add(backgroundClass);
+
+    // activate animations
+    setTimeout(() => {
+        overlayElement.style.opacity = 0;
+    }, 100)
+
+
+    // remove overlay
+    setTimeout(() => {
+        backgroundWeatherContainer.removeChild(overlayElement);
+    }, 5000)
 }
-
-
-
-//setBackgroundWeather({
-//    fixedCloudNumber: 1,
-//    cloudGenerationFactor: 40,
-//    timeBetweenCloudSpawnInMiliseconds: 1000,
-
-//    maxCloudSpeedInPixelsPerSecond: 170,
-//    minCloudSpeedInPixelsPerSecond: 140,
-
-//    maxCloudElevationInPixels: 225,
-//    minCloudElevationInPixels: 175,
-
-//    maxCloudScale: 60,
-//    minCloudScale: 50,
-
-//    maxCloudOpacity: 100,
-//    minCloudOpacity: 75,
-
-//    typeOfPrecipitation: "rain",
-//    precipitationSpawnIntervalInSeconds: 0.7,
-//    thunder: false, // Moderate or heavy rain with thunder
-
-//    backgroundCssClass: "Day"
-//})

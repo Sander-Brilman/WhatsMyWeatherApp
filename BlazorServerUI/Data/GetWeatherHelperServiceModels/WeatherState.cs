@@ -8,6 +8,8 @@ public class WeatherState
 
     public required float AverageTempInCelcius { get; set; }
 
+    public required float PrecipitationInMM { get; set; }
+
     public required BackgroundWeatherGenerationOptions WeatherGenerationOptions { get; set; }
 }
 
