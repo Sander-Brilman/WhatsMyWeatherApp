@@ -47,7 +47,7 @@
 
     string GenerateCSSGradient()
     {
-        const int transitionSpacePerSectionPercentage = 5;
+        const int transitionSpacePerSectionPercentage = 0;
         const int totalSpaceNeededByTransitionPercentage = 4 * transitionSpacePerSectionPercentage;
         const int aviliblePercentagesForSecions = 100 - totalSpaceNeededByTransitionPercentage;
 
@@ -81,27 +81,22 @@
 
         TimeSpan firstNightPartDuration = SunriseStart - startOfDay;
         int firstNightPartRelativePercentage = calculateRelativePercentageOfDay(firstNightPartDuration);
-        int firstNightPartAbsolutePercentage = convertToAbsolutePercentage(firstNightPartRelativePercentage);
 
 
         TimeSpan sunriseDuration = SunriseDuration;
         int sunriseRelativePercentage = calculateRelativePercentageOfDay(sunriseDuration);
-        int sunriseAbsolutePercentage = convertToAbsolutePercentage(sunriseRelativePercentage);
 
 
         // calculate daylight time
         TimeSpan daylightDuration = SunsetStart - SunriseStart.Add(SunriseDuration);
         int daylightRelativePercentage = calculateRelativePercentageOfDay(daylightDuration);
-        int daylightAbsolutePercentage = convertToAbsolutePercentage(daylightRelativePercentage);
 
 
         TimeSpan sunsetDuration = SunsetDuration;
         int sunsetRelativePercentage = calculateRelativePercentageOfDay(sunsetDuration);
-        int sunsetAbsolutePercentage = convertToAbsolutePercentage(sunsetRelativePercentage);
 
 
         int lastNightPartRelativePercentage = 100 - (firstNightPartRelativePercentage + sunriseRelativePercentage + daylightRelativePercentage + sunsetRelativePercentage);
-        int lastNightPartAbsolutePercentage = convertToAbsolutePercentage(lastNightPartRelativePercentage);
 
 
         //
@@ -110,11 +105,11 @@
 
         List<KeyValuePair<string, int>> rgbColorSections = new()
         {
-            new("rgba(0,0,0,1)", firstNightPartAbsolutePercentage),
-            new("rgba(255,128,0,1)", sunriseAbsolutePercentage),
-            new("rgba(0,224,255,1)", daylightAbsolutePercentage),
-            new("rgba(255,128,0,1)", sunsetAbsolutePercentage),
-            new("rgba(0,0,0,1)", lastNightPartAbsolutePercentage),
+            new("rgba(0,0,0,1)", firstNightPartRelativePercentage),
+            new("rgba(255,128,0,1)",    sunriseRelativePercentage),
+            new("rgba(0,224,255,1)",   daylightRelativePercentage),
+            new("rgba(255,128,0,1)",     sunsetRelativePercentage),
+            new("rgba(0,0,0,1)",  lastNightPartRelativePercentage),
         };
 
         string finalLinearGradient = "linear-gradient(90deg,";
@@ -127,7 +122,7 @@
             finalLinearGradient += $"{colorSection.Key} {percentageAccumulation}%,";
 
             // add size of the section
-            percentageAccumulation += colorSection.Value;
+            percentageAccumulation += convertToAbsolutePercentage(colorSection.Value);
 
             // end of the section
             finalLinearGradient += $"{colorSection.Key} {percentageAccumulation}%";
@@ -148,32 +143,6 @@
         finalLinearGradient += ")";
 
         return finalLinearGradient;
-
-
-
-
-
-
-
-        //
-        // enter first-class spaggeti 🍝, bon appetit
-        //
-
-    //     return $@"linear-gradient(90deg,
-    // {/* nacht 21 */""}      rgba(0,0,0,1)   {firstNightPartAbsolutePercentage}%,
-                            
-    // {/* sunrise start */""} rgba(255,128,0,1) {firstNightPartAbsolutePercentage + transitionSpacePerSectionPercentage}%,
-    // {/* sunrise start */""} rgba(255,128,0,1) {firstNightPartAbsolutePercentage + transitionSpacePerSectionPercentage + sunriseAbsolutePercentage}%,
-                            
-    // {/* day start */""}     rgba(0,224,255,1) {firstNightPartAbsolutePercentage + transitionSpacePerSectionPercentage + sunriseAbsolutePercentage + transitionSpacePerSectionPercentage}%,
-    // {/* day end */""}       rgba(0,224,255,1) {}%,
-                            
-    // {/* sunset start */""}  rgba(255,128,0,1) {}%,
-    // {/* sunset end */""}    rgba(255,128,0,1) {}%,
-                            
-    // {/* nacht */""}         rgba(0,0,0,1) {}%
-    //     );
-    //     ";
     }
 
 }
