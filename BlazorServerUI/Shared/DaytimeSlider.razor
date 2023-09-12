@@ -1,7 +1,7 @@
-﻿<input type="range" min="0" max="23" value="@CurrentHour" @onchange="HandleChange" />
+﻿<input style="--slider-background: @GenerateCSSGradient();" type="range" min="0" max="23" value="@CurrentHour" @onchange="HandleChange" />
 
 
-@GenerateCSSGradient();
+
 
 @code {
     [Parameter, EditorRequired]
@@ -13,7 +13,7 @@
 
 
     [Parameter, EditorRequired]
-    public DateTimeOffset Sunrise { get; set; }
+    public DateTimeOffset SunriseStart { get; set; }
 
     [Parameter, EditorRequired]
     public TimeSpan SunriseDuration { get; set; }
@@ -21,7 +21,7 @@
 
 
     [Parameter, EditorRequired]
-    public DateTimeOffset Sunset { get; set; }
+    public DateTimeOffset SunsetStart { get; set; }
 
     [Parameter, EditorRequired]
     public TimeSpan SunsetDuration { get; set; }
@@ -47,51 +47,133 @@
 
     string GenerateCSSGradient()
     {
+        const int transitionSpacePerSectionPercentage = 5;
+        const int totalSpaceNeededByTransitionPercentage = 4 * transitionSpacePerSectionPercentage;
+        const int aviliblePercentagesForSecions = 100 - totalSpaceNeededByTransitionPercentage;
 
-        const int totalMinutesInADay = 24 * 60;
 
 
-        int calculatePercentageFromMinutes(int current)
+        int calculateRelativePercentageOfDay(TimeSpan current)
         {
-            return 100 * current / totalMinutesInADay;
+            const int totalMinutesInADay = 24 * 60;
+
+            return (int)Math.Round(100 * current.TotalMinutes / totalMinutesInADay);
         }
 
 
+        int convertToAbsolutePercentage(int relativePercentage)
+        {
+            return relativePercentage * aviliblePercentagesForSecions / 100;
+        }
+
+
+        DateTimeOffset startOfDay = new(SunriseStart.Date, SunriseStart.Offset);
+
+
+        // 
+        // calculate percentages per section. most of the variables can be directly used in method calls but are here for readability
+        //
+        // RelativePercentage is how much % of the available space reserved for the secions it will use
+        //
+        // AbsolutePercentage is how much % of the total space within the slider it will use.
+        //
+
+
+        TimeSpan firstNightPartDuration = SunriseStart - startOfDay;
+        int firstNightPartRelativePercentage = calculateRelativePercentageOfDay(firstNightPartDuration);
+        int firstNightPartAbsolutePercentage = convertToAbsolutePercentage(firstNightPartRelativePercentage);
+
+
+        TimeSpan sunriseDuration = SunriseDuration;
+        int sunriseRelativePercentage = calculateRelativePercentageOfDay(sunriseDuration);
+        int sunriseAbsolutePercentage = convertToAbsolutePercentage(sunriseRelativePercentage);
+
+
+        // calculate daylight time
+        TimeSpan daylightDuration = SunsetStart - SunriseStart.Add(SunriseDuration);
+        int daylightRelativePercentage = calculateRelativePercentageOfDay(daylightDuration);
+        int daylightAbsolutePercentage = convertToAbsolutePercentage(daylightRelativePercentage);
+
+
+        TimeSpan sunsetDuration = SunsetDuration;
+        int sunsetRelativePercentage = calculateRelativePercentageOfDay(sunsetDuration);
+        int sunsetAbsolutePercentage = convertToAbsolutePercentage(sunsetRelativePercentage);
+
+
+        int lastNightPartRelativePercentage = 100 - (firstNightPartRelativePercentage + sunriseRelativePercentage + daylightRelativePercentage + sunsetRelativePercentage);
+        int lastNightPartAbsolutePercentage = convertToAbsolutePercentage(lastNightPartRelativePercentage);
+
+
+        //
+        // construct the linear gradient
+        //
+
+        List<KeyValuePair<string, int>> rgbColorSections = new()
+        {
+            new("rgba(0,0,0,1)", firstNightPartAbsolutePercentage),
+            new("rgba(255,128,0,1)", sunriseAbsolutePercentage),
+            new("rgba(0,224,255,1)", daylightAbsolutePercentage),
+            new("rgba(255,128,0,1)", sunsetAbsolutePercentage),
+            new("rgba(0,0,0,1)", lastNightPartAbsolutePercentage),
+        };
+
+        string finalLinearGradient = "linear-gradient(90deg,";
+        int count = 1;
+        int percentageAccumulation = 0;
+
+        foreach (var colorSection in rgbColorSections)
+        {
+            // start of the section
+            finalLinearGradient += $"{colorSection.Key} {percentageAccumulation}%,";
+
+            // add size of the section
+            percentageAccumulation += colorSection.Value;
+
+            // end of the section
+            finalLinearGradient += $"{colorSection.Key} {percentageAccumulation}%";
+
+            // add spacing for next section
+            percentageAccumulation += transitionSpacePerSectionPercentage;
+
+            // add comma if needed
+            if (rgbColorSections.Count != count)
+            {
+                finalLinearGradient += ",";
+            }
+
+            count++;
+        }
+
+        // add end bracket
+        finalLinearGradient += ")";
+
+        return finalLinearGradient;
 
 
 
-        int nightToSunriseMinutes = Sunrise.Minute + (Sunrise.Hour * 60);
-        int nightToSunrisePercentage = calculatePercentageFromMinutes(nightToSunriseMinutes);
-
-        int sunriseToDayMinutes = SunriseDuration.Minutes;
-        int sunriseToDayPercentage = calculatePercentageFromMinutes(sunriseToDayMinutes);
-
-        int dayToSunsetMinutes = SunsetDuration.Minutes;
-        int dayToSunsetPercentage = calculatePercentageFromMinutes(dayToSunsetMinutes);
-
-        int sunsetToNightMinutes = totalMinutesInADay - (Sunset.Minute + (Sunset.Hour * 60));
-        int sunsetToNightPercentage = calculatePercentageFromMinutes(sunsetToNightMinutes);
 
 
-        Console.WriteLine("e");
-
-        // grootte sunrise
-        // grootte sunset
-        // grootte dag
-        // nacht
-
-        //nacht begin 0:00 tot sunrise minuten en dan naar procenten 
 
 
-        return $@"linear-gradient(90deg,
-            rgba(0,0,0,1) 10%,              {/* nacht */""}
-            rgba(255,128,0,1) 20%,          {/* nacht - sunrise */""}
-            rgba(0,224,255,1) 30%,          {/* sunrise - dag */""}
-            rgba(0,224,255,1) 70%,          {/* dag - sunset */""}
-            rgba(255,128,0,1) 80%,          {/* sunset - nacht */""}
-            rgba(0,0,0,1) 90%               {/* nacht */""}
-        );
-        ";
+        //
+        // enter first-class spaggeti 🍝, bon appetit
+        //
+
+    //     return $@"linear-gradient(90deg,
+    // {/* nacht 21 */""}      rgba(0,0,0,1)   {firstNightPartAbsolutePercentage}%,
+                            
+    // {/* sunrise start */""} rgba(255,128,0,1) {firstNightPartAbsolutePercentage + transitionSpacePerSectionPercentage}%,
+    // {/* sunrise start */""} rgba(255,128,0,1) {firstNightPartAbsolutePercentage + transitionSpacePerSectionPercentage + sunriseAbsolutePercentage}%,
+                            
+    // {/* day start */""}     rgba(0,224,255,1) {firstNightPartAbsolutePercentage + transitionSpacePerSectionPercentage + sunriseAbsolutePercentage + transitionSpacePerSectionPercentage}%,
+    // {/* day end */""}       rgba(0,224,255,1) {}%,
+                            
+    // {/* sunset start */""}  rgba(255,128,0,1) {}%,
+    // {/* sunset end */""}    rgba(255,128,0,1) {}%,
+                            
+    // {/* nacht */""}         rgba(0,0,0,1) {}%
+    //     );
+    //     ";
     }
 
 }

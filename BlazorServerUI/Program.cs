@@ -7,6 +7,7 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 
 builder.Services.AddScoped<GetWeatherHelper>();
+
 builder.Services.AddHttpClient<GetWeatherHelper>(client =>
 {
     client.BaseAddress = new Uri("https://api.weatherapi.com/v1/");

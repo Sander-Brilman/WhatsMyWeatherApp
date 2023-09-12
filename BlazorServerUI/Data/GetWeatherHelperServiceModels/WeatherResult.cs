@@ -2,9 +2,9 @@
 
 public class WeatherResult
 {
-    public required DateTimeOffset Sunrise { get; set; }
+    public required DateTimeOffset SunriseStart { get; set; }
 
-    public required DateTimeOffset Sunset { get; set; }
+    public required DateTimeOffset SunsetStart { get; set; }
 
     public required DateTimeOffset LocalTime { get; set; }
 

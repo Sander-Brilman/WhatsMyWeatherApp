@@ -6,16 +6,16 @@ public static class Extentions
 {
     public static TimeOfDay GetTimeOfDay(
         this DateTimeOffset localtime, 
-        DateTimeOffset sunrise, 
-        DateTimeOffset sunset, 
+        DateTimeOffset sunriseStart, 
+        DateTimeOffset sunsetStart, 
         TimeSpan SunriseDuration,
         TimeSpan SunsetDuration
     ) {
         return
-            localtime > sunrise && localtime < sunset
-                ? localtime < sunrise.Add(SunriseDuration)
+            localtime > sunriseStart && localtime < sunsetStart
+                ? localtime < sunriseStart.Add(SunriseDuration)
                     ? TimeOfDay.Sunrise
-                    : localtime > sunset.Subtract(SunsetDuration)
+                    : localtime > sunsetStart.Subtract(SunsetDuration)
                         ? TimeOfDay.Sunset
                         : TimeOfDay.Day
                 : TimeOfDay.Night;

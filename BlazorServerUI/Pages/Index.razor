@@ -7,10 +7,10 @@
             @if (resultFromApi is not null)
             {
                 <DaytimeSlider 
-                    Sunrise="resultFromApi.Sunrise" 
+                    SunriseStart="resultFromApi.SunriseStart" 
                     SunriseDuration="resultFromApi.SunriseDuration" 
                     
-                    Sunset="resultFromApi.Sunset"
+                    SunsetStart="resultFromApi.SunsetStart"
                     SunsetDuration="resultFromApi.SunsetDuration"
                     
                     CurrentHour="resultFromApi.LocalTime.Hour" 
@@ -44,6 +44,8 @@
 
     int currentHour;
 
+    bool weatherShouldRender = true;
+
     async Task SetSelectedWeather(int hour)
     {
         if (resultFromApi is null)
@@ -56,13 +58,14 @@
 
         WeatherState selectedWeatherState = resultFromApi.HourlyWeather[hour];
 
-        bool reRenderBackgroundWeather = displayedWeatherState is null || selectedWeatherState.Status != displayedWeatherState.Status;
+        bool reRenderBackgroundWeather = weatherShouldRender || displayedWeatherState is null || selectedWeatherState.Status != displayedWeatherState.Status;
 
         displayedWeatherState = selectedWeatherState;
 
         if (reRenderBackgroundWeather)
         {
             await SetBackgroundWeather();
+            weatherShouldRender = false;
         }
 
         StateHasChanged();
@@ -72,10 +75,13 @@
     /// Fetch weather result from service and d
     /// </summary>
     /// <returns></returns>
-    async Task FetchWeather()     {         if (location.Location == "") {
+    async Task FetchWeather()     {
+        weatherShouldRender = true;
+
+        if (location.Location == "") {
             await GetLocationFromBrowser();
             return;
-        }           try         {
+        }          try         {
             resultFromApi = await weatherHelper.GetWeatherStatusForLocationAsync(location.Location);
 
             if (resultFromApi is null)

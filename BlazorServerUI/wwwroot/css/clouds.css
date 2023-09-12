@@ -104,5 +104,5 @@
         }
 
         #background-weather > .overlay.background-transition {
-            transition-duration: 5s;
+            transition-duration: 2s;
         }
