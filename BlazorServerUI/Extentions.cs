@@ -11,14 +11,37 @@ public static class Extentions
         TimeSpan SunriseDuration,
         TimeSpan SunsetDuration
     ) {
-        return
-            localtime > sunriseStart && localtime < sunsetStart
-                ? localtime < sunriseStart.Add(SunriseDuration)
-                    ? TimeOfDay.Sunrise
-                    : localtime > sunsetStart.Subtract(SunsetDuration)
-                        ? TimeOfDay.Sunset
-                        : TimeOfDay.Day
-                : TimeOfDay.Night;
+        TimeOfDay result;
+
+        DateTimeOffset sunriseEnd = sunriseStart.Add(SunriseDuration);
+        DateTimeOffset sunsetEnd = sunsetStart.Add(SunsetDuration);
+
+        if (localtime.Hour == 7) 
+            Console.WriteLine("e");
+
+
+        if (localtime < sunriseStart)
+        {
+            result = TimeOfDay.Night;
+        }
+        else if (localtime >= sunriseStart && localtime <= sunriseEnd) 
+        {
+            result = TimeOfDay.Sunrise;
+        }
+        else if (localtime > sunriseEnd && localtime < sunsetStart)
+        {
+            result = TimeOfDay.Day;
+        }
+        else if (localtime >= sunsetStart && localtime <= sunsetEnd)
+        {
+            result = TimeOfDay.Sunset;
+        } 
+        else
+        {
+            result = TimeOfDay.Night;
+        }
+
+        return result;
     }
 
     public static string ToCssClass(this TimeOfDay timeOfDay, bool setDaylightToDark = false)

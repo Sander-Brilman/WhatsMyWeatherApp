@@ -1,22 +1,17 @@
 ﻿@page "/" @using BlazorServerUI.Data.GetWeatherHelperServiceModels; @using BlazorServerUI.Services; @using System.ComponentModel.DataAnnotations;
-@inject HttpClient http; @inject IJSRuntime js; @inject GetWeatherHelper weatherHelper  @if (error is not null) {     <div role="alert">         @error     </div> }  <h1>Wat is mijn weer?</h1>  <EditForm Model="location" OnValidSubmit="FetchWeather" >
+@inject HttpClient http; @inject IJSRuntime js; @inject GetWeatherHelper weatherHelper  @if (error is not null) {     <div role="alert">         @error     </div> }  <h1>Wat is mijn weer?</h1>  <input min="0" max="23" type="range" />  <EditForm Model="location" OnValidSubmit="FetchWeather" >
     <div class="input-container">
         <div>
             <input placeholder="Accept the location request to fill-in automatically" @bind="location.Location" type="text" autocomplete="address-level2">             <button type="submit" title="Get weather from location"><i class="fa-solid fa-magnifying-glass"></i></button>         </div>
         <div>
             @if (resultFromApi is not null)
             {
-                <DaytimeSlider 
-                    SunriseStart="resultFromApi.SunriseStart" 
-                    SunriseDuration="resultFromApi.SunriseDuration" 
-                    
-                    SunsetStart="resultFromApi.SunsetStart"
-                    SunsetDuration="resultFromApi.SunsetDuration"
-                    
-                    CurrentHour="resultFromApi.LocalTime.Hour" 
-                    OnChange="SetSelectedWeather" />
-
-                @currentHour
+                <DaytimeSlider SunriseStart="resultFromApi.SunriseStart"
+                                SunriseDuration="resultFromApi.SunriseDuration"
+                                SunsetStart="resultFromApi.SunsetStart"
+                                SunsetDuration="resultFromApi.SunsetDuration"
+                                CurrentHour="resultFromApi.LocalTime.Hour"
+                                OnChange="SetSelectedWeather" />
             }
         </div>
     </div> </EditForm>  <div class="weatherStatus">
@@ -46,6 +41,27 @@
 
     bool weatherShouldRender = true;
 
+
+
+
+
+
+
+
+    // als op knopje drukt dan gaat overgang goed als via enter dan gaat die naar dag, wtfffff
+
+
+
+
+
+
+
+
+
+
+
+
+
     async Task SetSelectedWeather(int hour)
     {
         if (resultFromApi is null)
@@ -58,7 +74,7 @@
 
         WeatherState selectedWeatherState = resultFromApi.HourlyWeather[hour];
 
-        bool reRenderBackgroundWeather = weatherShouldRender || displayedWeatherState is null || selectedWeatherState.Status != displayedWeatherState.Status;
+        bool reRenderBackgroundWeather = true;// weatherShouldRender || displayedWeatherState is null || selectedWeatherState.Status != displayedWeatherState.Status;
 
         displayedWeatherState = selectedWeatherState;
 

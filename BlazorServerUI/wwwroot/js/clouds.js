@@ -362,5 +362,5 @@ function setBackground(backgroundClass) {
     // remove overlay
     setTimeout(() => {
         backgroundWeatherContainer.removeChild(overlayElement);
-    }, 2000)
+    }, 2100)
 }

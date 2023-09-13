@@ -14,18 +14,16 @@ public static class SunTimesCalculator
         coordinate.LoadCartesianInfo();
 
 
-        DateTime sunriseStart = coordinate.CelestialInfo.AdditionalSolarTimes.AstronomicalDawn.Value;
+        DateTimeOffset sunriseStart = new(coordinate.CelestialInfo.AdditionalSolarTimes.AstronomicalDawn.Value, localtime.Offset);
 
-        TimeSpan sunriseDuration = coordinate.CelestialInfo.SunRise - sunriseStart 
-            ?? throw new Exception($"{nameof(sunriseDuration)} is empty");
-
+        TimeSpan sunriseDuration = new DateTimeOffset(coordinate.CelestialInfo.SunRise.Value, localtime.Offset) - sunriseStart;
 
 
 
-        DateTime sunsetStart = coordinate.CelestialInfo.SunSet.Value;
 
-        TimeSpan sunsetDuration = coordinate.CelestialInfo.AdditionalSolarTimes.AstronomicalDusk - sunsetStart
-            ?? throw new Exception($"{nameof(sunsetDuration)} timespan is empty");
+        DateTimeOffset sunsetStart = new(coordinate.CelestialInfo.SunSet.Value, localtime.Offset);
+
+        TimeSpan sunsetDuration = new DateTimeOffset(coordinate.CelestialInfo.AdditionalSolarTimes.AstronomicalDusk.Value, localtime.Offset) - sunsetStart;
 
 
         return (sunriseStart, sunriseDuration, sunsetStart, sunsetDuration);

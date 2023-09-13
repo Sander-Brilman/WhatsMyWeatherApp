@@ -1,5 +1,50 @@
-﻿<input style="--slider-background: @GenerateCSSGradient();" type="range" min="0" max="23" value="@CurrentHour" @onchange="HandleChange" />
+﻿
 
+<div style="--slider-background: @GenerateCSSGradient();">
+</div>
+
+<input type="range" min="0" max="23" style="--slider-background: @GenerateCSSGradient();" @onchange="HandleChange" />
+
+
+@* 
+<div class="slider" style="--slider-background: @GenerateCSSGradient();">
+    <div class="indicator" style="--indicator-left: @(calculatePercentage(23, rawSelectedHour).ToString().Replace(',', '.'))%;"></div>
+</div>
+
+<input type="number" min="0" max="23" value="@CurrentHour" @onchange="HandleChange" /> *@
+@* 
+
+<div>
+
+    @if (test is not null)
+    {
+        <ul>
+            @foreach (var thing in test)
+            {
+                <li>@thing.Value %</li>
+            }
+        </ul>
+    }
+
+    <br />
+    <br />
+
+    @rawSelectedHour -> @selectedHour
+
+    <br />
+    <br />
+
+    @SunriseStart
+    @SunriseStart.Add(SunriseDuration)
+
+    <br />
+    <br />
+
+    @SunsetStart
+    @SunsetStart.Add(SunsetDuration)
+
+
+</div> *@
 
 
 
@@ -26,28 +71,41 @@
     [Parameter, EditorRequired]
     public TimeSpan SunsetDuration { get; set; }
 
+    int selectedHour;
 
+    double rawSelectedHour;
 
     protected override void OnParametersSet()
     {
+        selectedHour = CurrentHour;
+        rawSelectedHour = CurrentHour;
+
         StateHasChanged();
     }
 
     async Task HandleChange(ChangeEventArgs changeEventArgs)
     {
-        if (int.TryParse((string)changeEventArgs.Value, out int selected) is false)
+        if (double.TryParse(((string)changeEventArgs.Value).Replace('.', ','), out double selectedAsDouble) is false)
         {
             return;
         }
 
-        await OnChange(selected);
+        rawSelectedHour = selectedAsDouble;
+        selectedHour = (int)Math.Round(selectedAsDouble);
+
+        await OnChange(selectedHour);
     }
 
+    List<KeyValuePair<string, int>> test;
 
+    int calculatePercentage(int max, double current)
+    {
+        return (int)Math.Round(100 * current / max);
+    }
 
     string GenerateCSSGradient()
     {
-        const int transitionSpacePerSectionPercentage = 0;
+        const int transitionSpacePerSectionPercentage = 3;
         const int totalSpaceNeededByTransitionPercentage = 4 * transitionSpacePerSectionPercentage;
         const int aviliblePercentagesForSecions = 100 - totalSpaceNeededByTransitionPercentage;
 
@@ -55,9 +113,9 @@
 
         int calculateRelativePercentageOfDay(TimeSpan current)
         {
-            const int totalMinutesInADay = 24 * 60;
+            const int totalMinutesInADay = 23 * 60;
 
-            return (int)Math.Round(100 * current.TotalMinutes / totalMinutesInADay);
+            return calculatePercentage(totalMinutesInADay, current.TotalMinutes);
         }
 
 
@@ -111,6 +169,8 @@
             new("rgba(255,128,0,1)",     sunsetRelativePercentage),
             new("rgba(0,0,0,1)",  lastNightPartRelativePercentage),
         };
+
+        test = rgbColorSections;
 
         string finalLinearGradient = "linear-gradient(90deg,";
         int count = 1;

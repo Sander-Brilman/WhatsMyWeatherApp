@@ -96,9 +96,18 @@ public class GetWeatherHelper
             HourlyWeather = forecastday.hour
                     .Select(x => new WeatherState()
                     {
-                        Time = new(DateTime.Parse(x.time), localtime.Offset),
+                        Time = new(DateTime.Parse(x.time), timezoneOffset),
 
-                        WeatherGenerationOptions = GenerateWeatherOptionsFromWeatherCode(x.condition.code, DateTimeOffset.Parse(x.time).GetTimeOfDay(sunriseStart, sunsetStart, SunriseDuration, SunsetDuration)),
+                        WeatherGenerationOptions = GenerateWeatherOptionsFromWeatherCode(
+                                                        x.condition.code, 
+                                                        new DateTimeOffset(DateTime.Parse(x.time), timezoneOffset)
+                                                            .GetTimeOfDay(
+                                                                sunriseStart, 
+                                                                sunsetStart, 
+                                                                SunriseDuration, 
+                                                                SunsetDuration
+                                                            )
+                                                    ),
                         Status = x.condition.text,
 
                         AverageTempInCelcius = x.temp_c,
