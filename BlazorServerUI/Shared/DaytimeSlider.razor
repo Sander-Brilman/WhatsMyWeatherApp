@@ -3,7 +3,7 @@
 <div style="--slider-background: @GenerateCSSGradient();">
 </div>
 
-<input type="range" min="0" max="23" style="--slider-background: @GenerateCSSGradient();" @onchange="HandleChange" />
+<input value="@CurrentHour" type="range" min="0" max="23" style="--slider-background: @GenerateCSSGradient();" @onchange="HandleChange" />
 
 
 @* 
@@ -77,15 +77,12 @@
 
     protected override void OnParametersSet()
     {
-        selectedHour = CurrentHour;
-        rawSelectedHour = CurrentHour;
-
         StateHasChanged();
     }
 
     async Task HandleChange(ChangeEventArgs changeEventArgs)
     {
-        if (double.TryParse(((string)changeEventArgs.Value).Replace('.', ','), out double selectedAsDouble) is false)
+        if (double.TryParse(((string)changeEventArgs.Value), out double selectedAsDouble) is false)
         {
             return;
         }
@@ -163,11 +160,11 @@
 
         List<KeyValuePair<string, int>> rgbColorSections = new()
         {
-            new("rgba(0,0,0,1)", firstNightPartRelativePercentage),
-            new("rgba(255,128,0,1)",    sunriseRelativePercentage),
-            new("rgba(0,224,255,1)",   daylightRelativePercentage),
-            new("rgba(255,128,0,1)",     sunsetRelativePercentage),
-            new("rgba(0,0,0,1)",  lastNightPartRelativePercentage),
+            new("#090331", firstNightPartRelativePercentage),
+            new("#386089",    sunriseRelativePercentage),
+            new("#5fc3ff",   daylightRelativePercentage),
+            new("#386089",     sunsetRelativePercentage),
+            new("#090331",  lastNightPartRelativePercentage),
         };
 
         test = rgbColorSections;

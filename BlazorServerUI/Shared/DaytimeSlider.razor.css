@@ -1,7 +1,7 @@
 ﻿
 
 
-div {
+/*div {
     background: var(--slider-background);
     width: 100%;
     height: 35px;
@@ -9,7 +9,7 @@ div {
     background-size: 97%;
     background-position: center;
     background-repeat: no-repeat;
-}
+}*/
 
 /*.slider {
     background: var(--slider-background);
@@ -48,11 +48,13 @@ input[type="range"] {
     -webkit-appearance: none;
     appearance: none;
     cursor: pointer;
-    height: 0;
+    height: 30px;
     --slider-thumb-color: #cb0000;
-    --slider-thumb-outline-color: #cb000099;
+    --slider-thumb-outline-color: #cb000052;
     --slider-thumb-outline-width: 5px;
     --slider-thumb-outline-offset: 0;
+    background: var(--slider-background);
+    border: solid 2px black;
 }
 
 
@@ -92,6 +94,7 @@ input[type="range"] {
     /* slider track */
     input[type="range"]::-moz-range-track {
         border-radius: 0px;
+        background: var(--slider-background);
     }
 
     /* slider thumb */

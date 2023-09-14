@@ -14,7 +14,7 @@ public static class SunTimesCalculator
         coordinate.LoadCartesianInfo();
 
 
-        DateTimeOffset sunriseStart = new(coordinate.CelestialInfo.AdditionalSolarTimes.AstronomicalDawn.Value, localtime.Offset);
+        DateTimeOffset sunriseStart = new(coordinate.CelestialInfo.AdditionalSolarTimes.NauticalDawn.Value, localtime.Offset);
 
         TimeSpan sunriseDuration = new DateTimeOffset(coordinate.CelestialInfo.SunRise.Value, localtime.Offset) - sunriseStart;
 
@@ -23,7 +23,7 @@ public static class SunTimesCalculator
 
         DateTimeOffset sunsetStart = new(coordinate.CelestialInfo.SunSet.Value, localtime.Offset);
 
-        TimeSpan sunsetDuration = new DateTimeOffset(coordinate.CelestialInfo.AdditionalSolarTimes.AstronomicalDusk.Value, localtime.Offset) - sunsetStart;
+        TimeSpan sunsetDuration = new DateTimeOffset(coordinate.CelestialInfo.AdditionalSolarTimes.NauticalDusk.Value, localtime.Offset) - sunsetStart;
 
 
         return (sunriseStart, sunriseDuration, sunsetStart, sunsetDuration);
