@@ -1,5 +1,5 @@
 ﻿@page "/" @using BlazorServerUI.Data.GetWeatherHelperServiceModels; @using BlazorServerUI.Services; @using System.ComponentModel.DataAnnotations;
-@inject HttpClient http; @inject IJSRuntime js; @inject GetWeatherHelper weatherHelper  @if (error is not null) {     <div role="alert">         @error     </div> }  <h1>Wat is mijn weer?</h1>  <input min="0" max="23" type="range" />  <EditForm Model="location" OnValidSubmit="FetchWeather" >
+@inject HttpClient http; @inject IJSRuntime js; @inject GetWeatherHelper weatherHelper  @if (error is not null) {     <div role="alert">         @error     </div> }  <h1>Wat is mijn weer?</h1>   <EditForm Model="location" OnValidSubmit="FetchWeather" >
     <div class="input-container">
         <div>
             <input placeholder="Accept the location request to fill-in automatically" @bind="location.Location" type="text" autocomplete="address-level2">             <button type="submit" title="Get weather from location"><i class="fa-solid fa-magnifying-glass"></i></button>         </div>

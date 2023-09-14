@@ -6,7 +6,7 @@ div {
     width: 100%;
     height: 35px;
     margin-bottom: -10px;
-    background-size: 96%;
+    background-size: 97%;
     background-position: center;
     background-repeat: no-repeat;
 }
@@ -38,13 +38,16 @@ div {
         transform: translateX(calc(-50% + -2px));
     }*/
 
+
+input[type="range"] {
+    width: 100%;
+}
+
 /*********** Baseline, reset styles ***********/
 input[type="range"] {
     -webkit-appearance: none;
     appearance: none;
-    /*    background: var(--slider-background); */
     cursor: pointer;
-    width: 100%;
     height: 0;
     --slider-thumb-color: #cb0000;
     --slider-thumb-outline-color: #cb000099;
