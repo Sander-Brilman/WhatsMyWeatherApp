@@ -1,42 +1,13 @@
 ﻿
-
-
-/*div {
-    background: var(--slider-background);
-    width: 100%;
-    height: 35px;
-    margin-bottom: -10px;
-    background-size: 97%;
-    background-position: center;
-    background-repeat: no-repeat;
-}*/
-
-/*.slider {
-    background: var(--slider-background);
-    width: 100%;
-    height: 20px;
-    position: relative;
-}
-
-.indicator {
+div.currentPosition {
     position: absolute;
-    top: -5px;
-    left: var(--indicator-left);
-    width: 2px;
-    height: 30px;
-    background: red;
+    left: calc(var(--left) + 2px);
+    height: 3rem;
+    margin-top: -5px;
+    border: dotted 2px #cb0000;
+    border-top: none;
+    border-bottom: none;
 }
-
-    .indicator::before {
-        position: absolute;
-        content: ' ';
-        border: solid 7px red;
-        border-left-color: transparent;
-        border-top-color: transparent;
-        rotate: 45deg;
-        top: -10px;
-        transform: translateX(calc(-50% + -2px));
-    }*/
 
 
 input[type="range"] {

@@ -1,59 +1,16 @@
 ﻿
-
-<div style="--slider-background: @GenerateCSSGradient();">
-</div>
-
-<input value="@CurrentHour" type="range" min="0" max="23" style="--slider-background: @GenerateCSSGradient();" @onchange="HandleChange" />
-
-
-@* 
-<div class="slider" style="--slider-background: @GenerateCSSGradient();">
-    <div class="indicator" style="--indicator-left: @(calculatePercentage(23, rawSelectedHour).ToString().Replace(',', '.'))%;"></div>
-</div>
-
-<input type="number" min="0" max="23" value="@CurrentHour" @onchange="HandleChange" /> *@
-@* 
-
-<div>
-
-    @if (test is not null)
-    {
-        <ul>
-            @foreach (var thing in test)
-            {
-                <li>@thing.Value %</li>
-            }
-        </ul>
-    }
-
-    <br />
-    <br />
-
-    @rawSelectedHour -> @selectedHour
-
-    <br />
-    <br />
-
-    @SunriseStart
-    @SunriseStart.Add(SunriseDuration)
-
-    <br />
-    <br />
-
-    @SunsetStart
-    @SunsetStart.Add(SunsetDuration)
-
-
-</div> *@
-
+<div class="currentPosition" style="--left: @(calculatePercentage(minutesInADay, currentTimeInMinutes))%;" tabindex="-1"></div>
+<input value="@currentTimeInMinutes" type="range" min="0" max="@minutesInADay" style="--slider-background: @GenerateCSSGradient();" @onchange="HandleChange" />
 
 
 @code {
-    [Parameter, EditorRequired]
-    public int CurrentHour { get; set; }
+    const int minutesInADay = 24 * 60;
 
     [Parameter, EditorRequired]
-    public Func<int, Task> OnChange { get; set; }
+    public DateTimeOffset CurrentTime { get; set; }
+
+    [Parameter, EditorRequired]
+    public Func<DateTimeOffset, Task> OnTimeSelect { get; set; }
 
 
 
@@ -71,29 +28,37 @@
     [Parameter, EditorRequired]
     public TimeSpan SunsetDuration { get; set; }
 
-    int selectedHour;
 
-    double rawSelectedHour;
+    double currentTimeInMinutes;
+
+    DateTimeOffset startOfDay;
+
 
     protected override void OnParametersSet()
     {
+        startOfDay = new DateTimeOffset(SunriseStart.Date, SunriseStart.Offset);
+
+        TimeSpan test = (CurrentTime - startOfDay);
+
+        currentTimeInMinutes = (CurrentTime - startOfDay).TotalMinutes;
+
         StateHasChanged();
     }
 
+
+
+
     async Task HandleChange(ChangeEventArgs changeEventArgs)
     {
-        if (double.TryParse(((string)changeEventArgs.Value), out double selectedAsDouble) is false)
+        if (int.TryParse(((string)changeEventArgs.Value), out int selectedMinuteOfDay) is false)
         {
             return;
         }
 
-        rawSelectedHour = selectedAsDouble;
-        selectedHour = (int)Math.Round(selectedAsDouble);
+        DateTimeOffset selectedTimeOfDay = startOfDay.AddMinutes(selectedMinuteOfDay);
 
-        await OnChange(selectedHour);
+        await OnTimeSelect(selectedTimeOfDay);
     }
-
-    List<KeyValuePair<string, int>> test;
 
     int calculatePercentage(int max, double current)
     {
@@ -120,9 +85,6 @@
         {
             return relativePercentage * aviliblePercentagesForSecions / 100;
         }
-
-
-        DateTimeOffset startOfDay = new(SunriseStart.Date, SunriseStart.Offset);
 
 
         // 
@@ -166,8 +128,6 @@
             new("#386089",     sunsetRelativePercentage),
             new("#090331",  lastNightPartRelativePercentage),
         };
-
-        test = rgbColorSections;
 
         string finalLinearGradient = "linear-gradient(90deg,";
         int count = 1;

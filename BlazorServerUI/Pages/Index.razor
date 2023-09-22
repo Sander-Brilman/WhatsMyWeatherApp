@@ -2,26 +2,32 @@
 @inject HttpClient http; @inject IJSRuntime js; @inject GetWeatherHelper weatherHelper  @if (error is not null) {     <div role="alert">         @error     </div> }  <h1>Wat is mijn weer?</h1>   <EditForm Model="location" OnValidSubmit="FetchWeather" >
     <div class="input-container">
         <div>
-            <input placeholder="Accept the location request to fill-in automatically" @bind="location.Location" type="text" autocomplete="address-level2">             <button type="submit" title="Get weather from location"><i class="fa-solid fa-magnifying-glass"></i></button>         </div>
+            <input placeholder="Geef toegang tot je locatie of vul zelf een plaats in" @bind="location.Location" type="text" autocomplete="address-level2">             <button class="search" type="submit" title="Get weather from location"><i class="fa-solid fa-magnifying-glass"></i></button>             <button @onclick="GetLocationFromBrowser" class="reset" type="button" title="reset location"><i class="fa-regular fa-arrow-rotate-left"></i></button>         </div>
+        @if (resultFromApi is not null)
+        {
+            <div>
+                @fullLocationTitle
+            </div>
+            <div>
+
+                    <DaytimeSlider SunriseStart="resultFromApi.SunriseStart"
+                                    SunriseDuration="resultFromApi.SunriseDuration"
+                                    SunsetStart="resultFromApi.SunsetStart"
+                                    SunsetDuration="resultFromApi.SunsetDuration"
+                                    CurrentTime="resultFromApi.LocalTime"
+                                    OnTimeSelect="SetSelectedWeather" />
+            </div>
+        }
+    </div> </EditForm>   @if (displayedWeatherState is not null)
+{
+    <div class="weatherStatus">
+        <h3>[ @displayedWeatherState.Status ]</h3>
         <div>
-            @if (resultFromApi is not null)
-            {
-                <DaytimeSlider SunriseStart="resultFromApi.SunriseStart"
-                                SunriseDuration="resultFromApi.SunriseDuration"
-                                SunsetStart="resultFromApi.SunsetStart"
-                                SunsetDuration="resultFromApi.SunsetDuration"
-                                CurrentHour="resultFromApi.LocalTime.Hour"
-                                OnChange="SetSelectedWeather" />
-            }
+            <p>@displayedWeatherState.AverageTempInCelcius <span class="celcius">°C</span></p>
+            <p>@displayedWeatherState.PrecipitationInMM <span class="rain">mm</span></p>
         </div>
-    </div> </EditForm>  <div class="weatherStatus">
-    <h3>[ @displayedWeatherState?.Status ]</h3>
-    <div>
-        <p>@displayedWeatherState?.AverageTempInCelcius <span class="celcius">°C</span></p>
-        <p>@displayedWeatherState?.PrecipitationInMM <span class="rain">mm</span></p>
     </div>
-</div>
- @code {
+}   @code {
 
     class InputLocation
     {
@@ -30,6 +36,8 @@
     }
 
     InputLocation location = new();
+
+    string fullLocationTitle;
 
     string? error;
 
@@ -41,17 +49,24 @@
 
     bool weatherShouldRender = true;
 
-    async Task SetSelectedWeather(int hour)
+    async Task SetSelectedWeather(DateTimeOffset selectedTimeOfDay)
     {
         if (resultFromApi is null)
         {
             return;
         }
 
-        currentHour = hour;
+        currentHour = selectedTimeOfDay.Hour;
 
 
-        WeatherState selectedWeatherState = resultFromApi.HourlyWeather[hour];
+        WeatherState selectedWeatherState = resultFromApi.HourlyWeather[currentHour];
+
+        selectedWeatherState.WeatherGenerationOptions.BackgroundCssClass = selectedTimeOfDay.GetTimeOfDay(
+            resultFromApi.SunriseStart,
+            resultFromApi.SunsetStart,
+            resultFromApi.SunriseDuration,
+            resultFromApi.SunsetDuration
+        ).ToCssClass();
 
         bool reRenderBackgroundWeather = true;// weatherShouldRender || displayedWeatherState is null || selectedWeatherState.Status != displayedWeatherState.Status;
 
@@ -87,14 +102,14 @@
 
             currentHour = resultFromApi.LocalTime.Hour;
 
-            location.Location = resultFromApi.Location;
+            fullLocationTitle = resultFromApi.Location;
 
             displayedWeatherState = resultFromApi.CurrentWeather;
             await SetBackgroundWeather();
 
             error = null;
         }         catch (Exception ex)         {             error = "Er is iets mis gegaan bij het ophalen van het weer!";              #if DEBUG         error += " => " + ex.Message;             #endif         }         // to do     }        //     // getting location from browser functions     //          public async Task SetBackgroundWeather()     {         if (displayedWeatherState is null) {
-            return;         }          await js.InvokeVoidAsync("setBackgroundWeather", displayedWeatherState.WeatherGenerationOptions);     }      [JSInvokable]     public void GetLocationErrorCallback()     {         error = "Something went wrong while trying to automatically get your location!";          StateHasChanged();     }      [JSInvokable]     public async Task GetLocationCallback(object latitude, object longitude)     {         location.Location = $"{latitude}, {longitude}";         await FetchWeather();         StateHasChanged();     }      async Task GetLocationFromBrowser() {
+            return;         }          await js.InvokeVoidAsync("setBackgroundWeather", displayedWeatherState.WeatherGenerationOptions);     }      [JSInvokable]     public void GetLocationErrorCallback()     {         error = "Er ging iets mis bij het automatish invullen van je locatie, zorg dat je toestemming geeft voor locatie gebruik of vul zelf een plaats in";          StateHasChanged();     }      [JSInvokable]     public async Task GetLocationCallback(object latitude, object longitude)     {         location.Location = $"{latitude}, {longitude}";         await FetchWeather();         StateHasChanged();     }      async Task GetLocationFromBrowser() {
         DateTimeOffset currentTime = DateTimeOffset.Now.ToOffset(TimeSpan.FromHours(2));
 
         await js.InvokeVoidAsync("getLocation", DotNetObjectReference.Create(this));
