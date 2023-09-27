@@ -39,17 +39,22 @@ h1 {
         width: 100%;
     }
 
-        .input-container > div:nth-child(2) {
+        .input-container > div.full-location {
             padding-top: 10px;
             color: grey;
             padding-bottom: 15px;
             border-bottom: solid 1px lightgrey;
-            margin-bottom: 25px;
         }
 
-        .input-container > div:last-child:not(:first-child) {
-            margin-bottom: 8px;
+        .input-container > p.time {
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 10px;
         }
+
+    .input-container > div:last-child {
+        margin-bottom: 8px;
+    }
 
         .input-container > div > :is(input, button) {
             outline-offset: 5px;
@@ -59,7 +64,6 @@ h1 {
         .input-container > div > input {
             flex-grow: 1;
             border: none;
-            margin-right: 10px;
             font-size: 1.2rem;
         }
 
@@ -82,14 +86,40 @@ h1 {
                 margin-right: 10px;
             }
 
+    .input-container > .slider-ticks {
+        padding-top: 3px;
+    }
+
+    .input-container > .slider-ticks > time {
+        position: absolute;
+        transform: translateX(-20%);
+        font-size: 0.7rem;
+        color: grey;
+    }
 
 
 
-            .weatherStatus {
-                color: white;
-                text-shadow: 2px 2px #0000005c;
-                font-weight: bold;
-            }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    .weatherStatus {
+        color: white;
+        text-shadow: 2px 2px #0000005c;
+        font-weight: bold;
+    }
 
     .weatherStatus > h3 {
         margin: auto;
@@ -123,3 +153,23 @@ h1 {
         .weatherStatus > div .rain {
             color: blue;
         }
+
+        .Night .weatherStatus > div .rain {
+            color: #75d1ff;
+        }
+
+.Sunrise .weatherStatus > div .rain {
+    color: #75d1ff;
+}
+
+.Day .weatherStatus > div .rain {
+    color: blue;
+}
+
+.DarkDay .weatherStatus > div .rain {
+    color: #75d1ff;
+}
+
+.Sunset .weatherStatus > div .rain {
+    color: #75d1ff;
+}

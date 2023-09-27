@@ -1,21 +1,36 @@
 ﻿@page "/" @using BlazorServerUI.Data.GetWeatherHelperServiceModels; @using BlazorServerUI.Services; @using System.ComponentModel.DataAnnotations;
 @inject HttpClient http; @inject IJSRuntime js; @inject GetWeatherHelper weatherHelper  @if (error is not null) {     <div role="alert">         @error     </div> }  <h1>Wat is mijn weer?</h1>   <EditForm Model="location" OnValidSubmit="FetchWeather" >
     <div class="input-container">
-        <div>
+        <div class="searchbar">
             <input placeholder="Geef toegang tot je locatie of vul zelf een plaats in" @bind="location.Location" type="text" autocomplete="address-level2">             <button class="search" type="submit" title="Get weather from location"><i class="fa-solid fa-magnifying-glass"></i></button>             <button @onclick="GetLocationFromBrowser" class="reset" type="button" title="reset location"><i class="fa-regular fa-arrow-rotate-left"></i></button>         </div>
         @if (resultFromApi is not null)
         {
-            <div>
+            <div class="full-location">
                 @fullLocationTitle
             </div>
-            <div>
-
+            <p class="time">@(selectedTime.Hour < 10 ? $"0{selectedTime.Hour}" : selectedTime.Hour):@(selectedTime.Minute < 10 ? $"0{selectedTime.Minute}" : selectedTime.Minute)</p>
+            <div class="slider">
                     <DaytimeSlider SunriseStart="resultFromApi.SunriseStart"
                                     SunriseDuration="resultFromApi.SunriseDuration"
                                     SunsetStart="resultFromApi.SunsetStart"
                                     SunsetDuration="resultFromApi.SunsetDuration"
                                     CurrentTime="resultFromApi.LocalTime"
                                     OnTimeSelect="SetSelectedWeather" />
+            </div>
+            <div class="slider-ticks">
+                <time style="left: 0%;">00</time>
+                <time style="left: 8.3%;">02</time>
+                <time style="left: 16.6%;">04</time>
+                <time style="left: 24.9%;">06</time>
+                <time style="left: 33.2%;">08</time>
+                <time style="left: 41.5%;">10</time>
+                <time style="left: 49.8%;">12</time>
+                <time style="left: 58.1%;">14</time>
+                <time style="left: 66.4%;">16</time>
+                <time style="left: 74.7%;">18</time>
+                <time style="left: 83%;">20</time>
+                <time style="left: 91.3%;">22</time>
+                <time style="left: 100%;">23</time>
             </div>
         }
     </div> </EditForm>   @if (displayedWeatherState is not null)
@@ -45,6 +60,7 @@
     WeatherState? displayedWeatherState;
     WeatherResult? resultFromApi;
 
+    DateTimeOffset selectedTime;
     int currentHour;
 
     bool weatherShouldRender = true;
@@ -56,6 +72,7 @@
             return;
         }
 
+        selectedTime = selectedTimeOfDay;
         currentHour = selectedTimeOfDay.Hour;
 
 
@@ -100,6 +117,7 @@
                 return;
             }
 
+            selectedTime = resultFromApi.LocalTime;
             currentHour = resultFromApi.LocalTime.Hour;
 
             fullLocationTitle = resultFromApi.Location;

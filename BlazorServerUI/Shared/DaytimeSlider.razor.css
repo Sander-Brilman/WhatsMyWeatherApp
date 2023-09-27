@@ -2,11 +2,18 @@
 div.currentPosition {
     position: absolute;
     left: calc(var(--left) + 2px);
-    height: 3rem;
+    height: 2.8rem;
     margin-top: -5px;
     border: dotted 2px #cb0000;
     border-top: none;
     border-bottom: none;
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Old versions of Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* Non-prefixed version, currently */
+    pointer-events: none;
 }
 
 
@@ -47,11 +54,10 @@ input[type="range"] {
     input[type="range"]::-webkit-slider-thumb {
         -webkit-appearance: none; /* Override default look */
         appearance: none;
-        margin-top: -7.5px; /* Centers thumb on the track */
+        margin-top: -5px; /* Centers thumb on the track */
         background-color: var(--slider-thumb-color);
         border-radius: 0rem;
-        height: 3rem;
-        margin-top: -20px;
+        height: 2.8rem;
         width: 3px;
     }
 
@@ -75,7 +81,7 @@ input[type="range"] {
         border-radius: 0rem;
         height: 3rem;
         width: 3px;
-        margin-top: -20px;
+        margin-top: -5px; /* Centers thumb on the track */
     }
 
     input[type="range"]:focus::-moz-range-thumb {

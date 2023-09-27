@@ -340,18 +340,20 @@ function setBackgroundWeather(cloudGenerationOptions) {
 
 function setBackground(backgroundClass) {
 
-    if (backgroundWeatherContainer.classList.contains(backgroundClass)) {
+    let backgroundClassReciever = document.querySelector('body');
+
+    if (backgroundClassReciever.classList.contains(backgroundClass)) {
         return;
     }
 
     let overlayElement = document.createElement("div")
-    overlayElement.classList.add('overlay', 'background-transition', backgroundWeatherContainer.classList.toString());
+    overlayElement.classList.add('overlay', 'background-transition', backgroundClassReciever.classList.toString());
 
 
     backgroundWeatherContainer.appendChild(overlayElement);
 
-    backgroundWeatherContainer.setAttribute('class', '');
-    backgroundWeatherContainer.classList.add(backgroundClass);
+    backgroundClassReciever.setAttribute('class', '');
+    backgroundClassReciever.classList.add(backgroundClass);
 
     // activate animations
     setTimeout(() => {

@@ -26,6 +26,7 @@
 
     .Sunset {
         background: linear-gradient(0deg, rgb(0, 5, 29) 0%, rgb(115, 65, 0) 100%);
+        background: linear-gradient(0deg, rgba(0,5,29,1) 40%, rgb(71 128 173) 100%);
     }
 
     .Night {

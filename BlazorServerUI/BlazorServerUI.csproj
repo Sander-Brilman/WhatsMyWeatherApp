@@ -11,7 +11,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="wwwroot\js\clouds.js" />
+    <None Include="wwwroot\js\clouds.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <ItemGroup>

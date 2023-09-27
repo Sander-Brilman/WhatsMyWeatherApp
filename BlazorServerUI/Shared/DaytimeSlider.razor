@@ -1,6 +1,23 @@
 ﻿
-<div class="currentPosition" style="--left: @(calculatePercentage(minutesInADay, currentTimeInMinutes))%;" tabindex="-1"></div>
-<input value="@currentTimeInMinutes" type="range" min="0" max="@minutesInADay" style="--slider-background: @GenerateCSSGradient();" @onchange="HandleChange" />
+<div 
+    class="currentPosition" 
+    style="--left: @(calculatePercentage(minutesInADay, currentTimeInMinutes) - 1)%;" 
+    tabindex="-1"></div>
+
+<input 
+    type="range"
+       
+    value="@sliderValue"
+
+
+    min="0" 
+    max="@minutesInADay" 
+    
+    style="--slider-background: @GenerateCSSGradient();" 
+    
+    @onchange="HandleChange" 
+/>
+
 
 
 @code {
@@ -29,6 +46,8 @@
     public TimeSpan SunsetDuration { get; set; }
 
 
+    int sliderValue;
+
     double currentTimeInMinutes;
 
     DateTimeOffset startOfDay;
@@ -41,6 +60,8 @@
         TimeSpan test = (CurrentTime - startOfDay);
 
         currentTimeInMinutes = (CurrentTime - startOfDay).TotalMinutes;
+
+        sliderValue = (int)currentTimeInMinutes;
 
         StateHasChanged();
     }
