@@ -46,6 +46,11 @@
     public TimeSpan SunsetDuration { get; set; }
 
 
+    TimeSpan timerDuration = TimeSpan.FromMinutes(1);
+
+    PeriodicTimer periodicTimer = new PeriodicTimer(timerDuration);
+
+
     int sliderValue;
 
     double currentTimeInMinutes;
