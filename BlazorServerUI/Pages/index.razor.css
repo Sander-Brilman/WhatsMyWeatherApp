@@ -40,7 +40,7 @@ h1 {
     }
 
         .input-container > div.searchbar {
-            gap: 5px;
+            gap: 12px;
             flex-wrap: nowrap;
         }
 

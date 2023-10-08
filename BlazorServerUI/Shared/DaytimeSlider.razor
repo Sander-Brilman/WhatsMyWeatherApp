@@ -1,13 +1,15 @@
-﻿
+﻿@implements IDisposable;
+
 <div 
-    class="currentPosition" 
-    style="--left: @(calculatePercentage(minutesInADay, currentTimeInMinutes) - 1)%;" 
-    tabindex="-1"></div>
+    class="currentPosition"
+     style="--left: @(calculatePercentageAsDouble(minutesInADay, currentTimeInMinutes))%;"
+     tabindex="-1"></div>
 
 <input 
     type="range"
        
-    value="@sliderValue"
+    @bind="sliderValue"
+    @bind:event="onclick"
 
 
     min="0" 
@@ -46,44 +48,132 @@
     public TimeSpan SunsetDuration { get; set; }
 
 
-    TimeSpan timerDuration = TimeSpan.FromMinutes(1);
+    //PeriodicTimer periodicTimer = new PeriodicTimer(TimeSpan.FromMinutes(1));
+    PeriodicTimer periodicTimer = new PeriodicTimer(TimeSpan.FromSeconds(1));
 
-    PeriodicTimer periodicTimer = new PeriodicTimer(timerDuration);
-
-
-    int sliderValue;
-
-    double currentTimeInMinutes;
 
     DateTimeOffset startOfDay;
-
 
     protected override void OnParametersSet()
     {
         startOfDay = new DateTimeOffset(SunriseStart.Date, SunriseStart.Offset);
 
-        TimeSpan test = (CurrentTime - startOfDay);
-
-        currentTimeInMinutes = (CurrentTime - startOfDay).TotalMinutes;
+        currentTimeInMinutes = (int)(CurrentTime - startOfDay).TotalMinutes;
 
         sliderValue = (int)currentTimeInMinutes;
+
+        Dispose();
+
+        updateTimerCancellationTokenSource = new();
+        updateTimerCancellationToken = updateTimerCancellationTokenSource.Token;
+
+        updateTimer = RunTimer();
+
 
         StateHasChanged();
     }
 
 
+    Task? updateTimer;
+
+    CancellationTokenSource updateTimerCancellationTokenSource;
 
 
-    async Task HandleChange(ChangeEventArgs changeEventArgs)
+
+
+    CancellationToken updateTimerCancellationToken;
+    int sliderValue;
+    int currentTimeInMinutes;
+
+    // async Task RunTimer()
+    // {
+    //     while (await periodicTimer.WaitForNextTickAsync(updateTimerCancellationToken) && !updateTimerCancellationToken.IsCancellationRequested)
+    //     {
+    //         Console.WriteLine($"");
+    //         Console.WriteLine($"before increment: {sliderValue}");
+
+    //         sliderValue++;
+    //         currentTimeInMinutes++;
+
+    //         Console.WriteLine($"after increment: {sliderValue}");
+
+    //         await TriggerOnTimeSelect(DateTime.Now.Second);
+
+    //         Console.WriteLine($"after function call: {sliderValue}");
+    //     }
+    // }
+
+
+
+    async Task RunTimer()
     {
-        if (int.TryParse(((string)changeEventArgs.Value), out int selectedMinuteOfDay) is false)
+        while (await periodicTimer.WaitForNextTickAsync(updateTimerCancellationToken) && !updateTimerCancellationToken.IsCancellationRequested)
         {
-            return;
-        }
+            int localSliderValue = sliderValue;
+            Console.WriteLine($"");
+            Console.WriteLine($"before increment: {localSliderValue}");
 
+            localSliderValue++;
+            currentTimeInMinutes++;
+
+            Console.WriteLine($"after increment: {localSliderValue}");
+
+            await TriggerOnTimeSelect(localSliderValue);
+            StateHasChanged();
+
+            Console.WriteLine($"after function call: {localSliderValue}");
+
+            sliderValue = localSliderValue;
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    public void Dispose()
+    {
+        if (updateTimer is not null)
+        {
+            updateTimerCancellationTokenSource.Cancel();
+        }
+    }
+
+    async Task TriggerOnTimeSelect(int selectedMinuteOfDay)
+    {
         DateTimeOffset selectedTimeOfDay = startOfDay.AddMinutes(selectedMinuteOfDay);
 
         await OnTimeSelect(selectedTimeOfDay);
+    }
+
+    async Task HandleChange(ChangeEventArgs changeEventArgs)
+    {
+        int selectedMinuteOfDay = int.Parse((string)changeEventArgs.Value);
+
+        await TriggerOnTimeSelect(selectedMinuteOfDay);
+    }
+
+
+
+
+
+    double calculatePercentageAsDouble(int max, double current)
+    {
+        return 100 * current / max;
     }
 
     int calculatePercentage(int max, double current)
