@@ -12,30 +12,35 @@ public class GetWeatherHelper
 {
     private readonly HttpClient _httpClient;
 
+    private readonly IConfiguration _configurationManager;
 
-    public GetWeatherHelper(HttpClient httpClient)
+
+    public GetWeatherHelper(HttpClient httpClient, IConfiguration configurationManager)
     {
         _httpClient = httpClient;
+        _configurationManager = configurationManager;
     }
 
 
 
 
-    public async Task<WeatherResult?> GetWeatherStatusForLocationAsync(string location)
+    public async Task<WeatherResult?> GetWeatherStatusForLocationAsync(string location, string lang)
     {
-        string uri = $"forecast.json?q={HttpUtility.UrlEncode(location)}&days=1&key=411ecacff37b4ba1a2d101159232306&lang=nl";
+        string apiKey = _configurationManager["apiKey"] ?? throw new Exception("api key not found!");
+
+        string uri = $"forecast.json?q={HttpUtility.UrlEncode(location)}&days=1&key={apiKey}lang={lang}";
 
         WeahterApiRootobject? apiResponse;
+            
+        var content = await _httpClient.GetAsync(uri);
 
-        try
-        {
-            apiResponse = await _httpClient.GetFromJsonAsync<WeahterApiRootobject>(uri);
-        }
-        catch (Exception)
+        if (content.IsSuccessStatusCode is false)
         {
             return null;
         }
 
+        apiResponse = await content.Content.ReadFromJsonAsync<WeahterApiRootobject?>();
+            
         if (apiResponse is null)
         {
             throw new Exception("APi response is null");
@@ -99,15 +104,14 @@ public class GetWeatherHelper
                         Time = new(DateTime.Parse(x.time), timezoneOffset),
 
                         WeatherGenerationOptions = GenerateWeatherOptionsFromWeatherCode(
-                                                        x.condition.code, 
-                                                        new DateTimeOffset(DateTime.Parse(x.time), timezoneOffset)
-                                                            .GetTimeOfDay(
-                                                                sunriseStart, 
-                                                                sunsetStart, 
-                                                                SunriseDuration, 
-                                                                SunsetDuration
-                                                            )
-                                                    ),
+                            x.condition.code, 
+                            new DateTimeOffset(DateTime.Parse(x.time), timezoneOffset)
+                                .GetTimeOfDay(
+                                    sunriseStart, 
+                                    sunsetStart, 
+                                    SunriseDuration, 
+                                    SunsetDuration)
+                        ),
                         Status = x.condition.text,
 
                         AverageTempInCelcius = x.temp_c,
@@ -237,7 +241,7 @@ public class GetWeatherHelper
                     PrecipitationSpawnIntervalInSeconds = 1.4,
                     Thunder = weatherCode == 1273, // Patchy light rain with thunder
 
-                    BackgroundCssClass = timeOfDay.ToCssClass(),
+                    BackgroundCssClass = timeOfDay.ToCssClass(true),
                 };
 
 

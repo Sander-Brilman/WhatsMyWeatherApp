@@ -79,7 +79,8 @@ h1 {
         .input-container > p.time {
             font-weight: bold;
             font-size: 1.1em;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
+            padding-left: 5px;
         }
 
         .input-container > div:last-child:not(:first-child) {
@@ -102,10 +103,15 @@ h1 {
 
     .input-container > .slider-ticks > time {
         position: absolute;
-        transform: translateX(-20%);
+        transform: translateX(-50%);
         font-size: 0.7rem;
         color: grey;
     }
+
+        /* magic number to make it visually more centered */ 
+        .input-container > .slider-ticks > time:first-child {
+            padding-left: 3px;
+        }
 
 
 

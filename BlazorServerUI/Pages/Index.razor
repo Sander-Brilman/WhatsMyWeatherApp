@@ -1,5 +1,30 @@
 ﻿@page "/" @using BlazorServerUI.Data.GetWeatherHelperServiceModels; @using BlazorServerUI.Services; @using System.ComponentModel.DataAnnotations;
-@inject HttpClient http; @inject IJSRuntime js; @inject GetWeatherHelper weatherHelper  @if (error is not null) {     <div role="alert">         @error     </div> }  <h1>Wat is mijn weer?</h1>   <EditForm Model="location" OnValidSubmit="FetchWeather" >
+@inject HttpClient http; @inject IJSRuntime js; @inject GetWeatherHelper weatherHelper   <HeadContent>
+    @{
+        string title = (Lang == "nl" ? "Wat wordt het weer?" : "What's my weather?") + " • sanderbrilman.nl";
+        string description = Lang == "nl" ? "Bekijk wat voor weer het vandaag wordt!" : "Check out what type of weather it will be today!";
+    }
+    <meta name="title" content="@(title)" />
+    <meta property="og:title" content="@(title)" />
+    <meta name="twitter:title" content="@(title)" />
+
+    <meta name="description" content="@(description)">
+    <meta property="og:description" content="@(description)" />
+    <meta name="twitter:description" content="@(description)" />
+
+    <meta property="og:image" content="/image.jfif" />
+    <meta name="twitter:image" content="/image.jfif" />
+    <meta property="og:image:alt" content="decorative image" />
+
+    <meta property="og:site_name" content="sanderbrilman.nl" />
+
+    <meta property="og:locale" content="@(Lang)_@(Lang!.ToUpper())" />
+    <meta property="og:type" content="website" />
+    <meta name="theme-color" content="#21E1E1" />
+
+    <link rel="apple-touch-icon" href="/image.jfif">
+    <link rel="apple-touch-startup-image" href="/image.jfif">
+</HeadContent>    @if (error is not null) {     <div role="alert">         @error     </div> }  <h1>     @(Lang == "nl"         ? "Wat wordt het weer?"         : "What's my weather?"     ) </h1>   <EditForm Model="location" OnValidSubmit="FetchWeather" >
     <div class="input-container">
         <div class="searchbar">
             <input placeholder="Geef toegang tot je locatie of vul zelf een plaats in" @bind="location.Location" type="text" autocomplete="address-level2">             <button class="search" type="submit" title="Get weather from location"><i class="fa-solid fa-magnifying-glass"></i></button>             <button @onclick="GetLocationFromBrowser" class="reset" type="button" title="reset location"><i class="fa-regular fa-arrow-rotate-left"></i></button>         </div>
@@ -44,6 +69,9 @@
     </div>
 }   @code {
 
+    [Parameter, SupplyParameterFromQuery(Name = "lang")]
+    public string? Lang { get; set; }
+
     class InputLocation
     {
         [Required(ErrorMessage = "Je moet dit wel invullen hè!")]
@@ -65,6 +93,17 @@
 
     bool weatherShouldRender = true;
 
+    protected override void OnInitialized()
+    {
+        Lang ??= "nl";
+    }
+
+
+    /// <summary>
+    /// Gets called by the DayTimeSlider component as a callback
+    /// </summary>
+    /// <param name="selectedTimeOfDay">the selected time of the day</param>
+    /// <returns></returns>
     async Task SetSelectedWeather(DateTimeOffset selectedTimeOfDay)
     {
         if (resultFromApi is null)
@@ -78,14 +117,7 @@
 
         WeatherState selectedWeatherState = resultFromApi.HourlyWeather[currentHour];
 
-        selectedWeatherState.WeatherGenerationOptions.BackgroundCssClass = selectedTimeOfDay.GetTimeOfDay(
-            resultFromApi.SunriseStart,
-            resultFromApi.SunsetStart,
-            resultFromApi.SunriseDuration,
-            resultFromApi.SunsetDuration
-        ).ToCssClass();
-
-        bool reRenderBackgroundWeather = true;// weatherShouldRender || displayedWeatherState is null || selectedWeatherState.Status != displayedWeatherState.Status;
+        bool reRenderBackgroundWeather = true;//weatherShouldRender || displayedWeatherState is null || selectedWeatherState.Status != displayedWeatherState.Status;
 
         displayedWeatherState = selectedWeatherState;
 
@@ -109,7 +141,7 @@
             await GetLocationFromBrowser();
             return;
         }          try         {
-            resultFromApi = await weatherHelper.GetWeatherStatusForLocationAsync(location.Location);
+            resultFromApi = await weatherHelper.GetWeatherStatusForLocationAsync(location.Location, Lang);
 
             if (resultFromApi is null)
             {

@@ -1,14 +1,5 @@
 ﻿namespace BlazorServerUI.Data.RawWeatherApiModels;
 
-public class WeatherRootObject
-{
-    public Location location { get; set; }
-    public Current current { get; set; }
-    public Forecast forecast { get; set; }
-}
-
-
-
 public class WeahterApiRootobject
 {
     public Location location { get; set; }
@@ -114,7 +105,7 @@ public class Astro
     public string moonrise { get; set; }
     public string moonset { get; set; }
     public string moon_phase { get; set; }
-    public string moon_illumination { get; set; }
+    public int moon_illumination { get; set; }
     public int is_moon_up { get; set; }
     public int is_sun_up { get; set; }
 }

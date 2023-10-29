@@ -1,24 +1,28 @@
 ﻿
 div.currentPosition {
     position: absolute;
-    left: calc(var(--left) + 2px);
+    left: var(--left);
     height: 2.8rem;
-    margin-top: -5px;
-    border: dotted 2px #cb0000;
+    margin-top: -7px;
+    border: dashed 2px #b32121a1;
     border-top: none;
     border-bottom: none;
+    transform: translateX(-50%);
     -webkit-touch-callout: none; /* iOS Safari */
     -webkit-user-select: none; /* Safari */
     -khtml-user-select: none; /* Konqueror HTML */
     -moz-user-select: none; /* Old versions of Firefox */
     -ms-user-select: none; /* Internet Explorer/Edge */
     user-select: none; /* Non-prefixed version, currently */
+
     pointer-events: none;
 }
 
 
 input[type="range"] {
     width: 100%;
+    margin: 0;
+    margin-bottom: 2px;
 }
 
 /*********** Baseline, reset styles ***********/
@@ -33,6 +37,8 @@ input[type="range"] {
     --slider-thumb-outline-offset: 0;
     background: var(--slider-background);
     border: solid 2px black;
+    border-left: none;
+    border-right: none;
 }
 
 
@@ -58,7 +64,7 @@ input[type="range"] {
         background-color: var(--slider-thumb-color);
         border-radius: 0rem;
         height: 2.8rem;
-        width: 3px;
+        width: 4px;
     }
 
     input[type="range"]:focus::-webkit-slider-thumb {
@@ -80,7 +86,7 @@ input[type="range"] {
         border: none; /*Removes extra border that FF applies*/
         border-radius: 0rem;
         height: 3rem;
-        width: 3px;
+        width: 4px;
         margin-top: -5px; /* Centers thumb on the track */
     }
 

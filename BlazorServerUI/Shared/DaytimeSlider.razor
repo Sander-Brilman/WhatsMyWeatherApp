@@ -1,23 +1,19 @@
-﻿@implements IDisposable;
-
-<div 
-    class="currentPosition"
+﻿<div 
+     class="currentPosition"
      style="--left: @(calculatePercentageAsDouble(minutesInADay, currentTimeInMinutes))%;"
      tabindex="-1"></div>
 
 <input 
+    aria-label="a slider selecting the current time of day"
     type="range"
        
-    @bind="sliderValue"
-    @bind:event="onclick"
-
+    @bind:get="sliderValue"
+    @bind:set="TriggerOnTimeSelect"
 
     min="0" 
     max="@minutesInADay" 
     
     style="--slider-background: @GenerateCSSGradient();" 
-    
-    @onchange="HandleChange" 
 />
 
 
@@ -48,10 +44,6 @@
     public TimeSpan SunsetDuration { get; set; }
 
 
-    //PeriodicTimer periodicTimer = new PeriodicTimer(TimeSpan.FromMinutes(1));
-    PeriodicTimer periodicTimer = new PeriodicTimer(TimeSpan.FromSeconds(1));
-
-
     DateTimeOffset startOfDay;
 
     protected override void OnParametersSet()
@@ -62,113 +54,20 @@
 
         sliderValue = (int)currentTimeInMinutes;
 
-        Dispose();
-
-        updateTimerCancellationTokenSource = new();
-        updateTimerCancellationToken = updateTimerCancellationTokenSource.Token;
-
-        updateTimer = RunTimer();
-
-
         StateHasChanged();
     }
 
-
-    Task? updateTimer;
-
-    CancellationTokenSource updateTimerCancellationTokenSource;
-
-
-
-
-    CancellationToken updateTimerCancellationToken;
     int sliderValue;
     int currentTimeInMinutes;
 
-    // async Task RunTimer()
-    // {
-    //     while (await periodicTimer.WaitForNextTickAsync(updateTimerCancellationToken) && !updateTimerCancellationToken.IsCancellationRequested)
-    //     {
-    //         Console.WriteLine($"");
-    //         Console.WriteLine($"before increment: {sliderValue}");
-
-    //         sliderValue++;
-    //         currentTimeInMinutes++;
-
-    //         Console.WriteLine($"after increment: {sliderValue}");
-
-    //         await TriggerOnTimeSelect(DateTime.Now.Second);
-
-    //         Console.WriteLine($"after function call: {sliderValue}");
-    //     }
-    // }
-
-
-
-    async Task RunTimer()
+    async Task TriggerOnTimeSelect(int chosenSliderValue)
     {
-        while (await periodicTimer.WaitForNextTickAsync(updateTimerCancellationToken) && !updateTimerCancellationToken.IsCancellationRequested)
-        {
-            int localSliderValue = sliderValue;
-            Console.WriteLine($"");
-            Console.WriteLine($"before increment: {localSliderValue}");
-
-            localSliderValue++;
-            currentTimeInMinutes++;
-
-            Console.WriteLine($"after increment: {localSliderValue}");
-
-            await TriggerOnTimeSelect(localSliderValue);
-            StateHasChanged();
-
-            Console.WriteLine($"after function call: {localSliderValue}");
-
-            sliderValue = localSliderValue;
-        }
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    public void Dispose()
-    {
-        if (updateTimer is not null)
-        {
-            updateTimerCancellationTokenSource.Cancel();
-        }
-    }
-
-    async Task TriggerOnTimeSelect(int selectedMinuteOfDay)
-    {
-        DateTimeOffset selectedTimeOfDay = startOfDay.AddMinutes(selectedMinuteOfDay);
+        DateTimeOffset selectedTimeOfDay = startOfDay.AddMinutes(chosenSliderValue);
 
         await OnTimeSelect(selectedTimeOfDay);
+        
+        sliderValue = chosenSliderValue;
     }
-
-    async Task HandleChange(ChangeEventArgs changeEventArgs)
-    {
-        int selectedMinuteOfDay = int.Parse((string)changeEventArgs.Value);
-
-        await TriggerOnTimeSelect(selectedMinuteOfDay);
-    }
-
-
-
 
 
     double calculatePercentageAsDouble(int max, double current)

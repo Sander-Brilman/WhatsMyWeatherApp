@@ -4,6 +4,7 @@
     top: 0;
     width: 100vw;
     height: 100vh;
+    min-height: 800px;
     overflow: hidden;
     z-index: -1;
 }
