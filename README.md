@@ -1,3 +1,6 @@
 code for my weather app,
 
-view on weer.sanderbrilman.nl
+you can view the result here:
+
+- **dutch version**: https://weer.sanderbrilman.nl
+- **english version**: https://weer.sanderbrilman.nl?lang=en
