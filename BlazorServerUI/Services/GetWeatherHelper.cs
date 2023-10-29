@@ -26,7 +26,7 @@ public class GetWeatherHelper
 
     public async Task<WeatherResult?> GetWeatherStatusForLocationAsync(string location, string lang)
     {
-        string apiKey = _configurationManager["apiKey"] ?? throw new Exception("api key not found!");
+        string apiKey = _configurationManager["whatsmyweather-apiKey"] ?? throw new Exception("api key not found!");
 
         string uri = $"forecast.json?q={HttpUtility.UrlEncode(location)}&days=1&key={apiKey}lang={lang}";
 
