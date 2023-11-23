@@ -6,9 +6,10 @@
 <input 
     aria-label="a slider selecting the current time of day"
     type="range"
-       
-    @bind:get="sliderValue"
-    @bind:set="TriggerOnTimeSelect"
+
+    @bind="chosenSliderValue"
+    @bind:after="TriggerOnTimeSelect"
+    @bind:event="oninput"
 
     min="0" 
     max="@minutesInADay" 
@@ -25,7 +26,7 @@
     public DateTimeOffset CurrentTime { get; set; }
 
     [Parameter, EditorRequired]
-    public Func<DateTimeOffset, Task> OnTimeSelect { get; set; }
+    public EventCallback<DateTimeOffset> OnTimeSelect { get; set; }
 
 
 
@@ -52,21 +53,22 @@
 
         currentTimeInMinutes = (int)(CurrentTime - startOfDay).TotalMinutes;
 
-        sliderValue = (int)currentTimeInMinutes;
+        @if (chosenSliderValue == 0)
+        {
+            chosenSliderValue = (int)currentTimeInMinutes;
+        }
 
         StateHasChanged();
     }
 
-    int sliderValue;
     int currentTimeInMinutes;
 
-    async Task TriggerOnTimeSelect(int chosenSliderValue)
+    int chosenSliderValue;
+    async Task TriggerOnTimeSelect()
     {
         DateTimeOffset selectedTimeOfDay = startOfDay.AddMinutes(chosenSliderValue);
 
-        await OnTimeSelect(selectedTimeOfDay);
-        
-        sliderValue = chosenSliderValue;
+        await OnTimeSelect.InvokeAsync(selectedTimeOfDay);
     }
 
 
