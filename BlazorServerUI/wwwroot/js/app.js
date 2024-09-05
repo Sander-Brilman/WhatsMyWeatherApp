@@ -1,3 +1,7 @@
+
+console.log("verison 8");
+
+
 function getLocation(dotNetReference) {
     if (("geolocation" in navigator) === false) {
         dotNetReference.invokeMethodAsync("GetLocationErrorCallback",);
