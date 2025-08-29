@@ -1,0 +1,96 @@
+﻿
+div.currentPosition {
+    position: absolute;
+    left: var(--left);
+    height: 2.8rem;
+    margin-top: -7px;
+    border: dashed 2px #b32121a1;
+    border-top: none;
+    border-bottom: none;
+    transform: translateX(-50%);
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Old versions of Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* Non-prefixed version, currently */
+
+    pointer-events: none;
+}
+
+
+input[type="range"] {
+    width: 100%;
+    margin: 0;
+    margin-bottom: 2px;
+}
+
+/*********** Baseline, reset styles ***********/
+input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    cursor: pointer;
+    height: 30px;
+    --slider-thumb-color: #cb0000;
+    --slider-thumb-outline-color: #cb000052;
+    --slider-thumb-outline-width: 5px;
+    --slider-thumb-outline-offset: 0;
+    background: var(--slider-background);
+    border: solid 2px black;
+    border-left: none;
+    border-right: none;
+}
+
+
+
+
+    /* Removes default focus */
+    input[type="range"]:focus {
+        outline: none;
+    }
+
+    /******** Chrome, Safari, Opera and Edge Chromium styles ********/
+
+    /* slider track */
+    input[type="range"]::-webkit-slider-runnable-track {
+        border-radius: 0px;
+    }
+
+    /* slider thumb */
+    input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none; /* Override default look */
+        appearance: none;
+        margin-top: -5px; /* Centers thumb on the track */
+        background-color: var(--slider-thumb-color);
+        border-radius: 0rem;
+        height: 2.8rem;
+        width: 4px;
+    }
+
+    input[type="range"]:focus::-webkit-slider-thumb {
+        outline: var(--slider-thumb-outline-width) solid var(--slider-thumb-outline-color);
+        outline-offset: var(--slider-thumb-outline-offset);
+    }
+
+    /*********** Firefox styles ***********/
+
+    /* slider track */
+    input[type="range"]::-moz-range-track {
+        border-radius: 0px;
+        background: var(--slider-background);
+    }
+
+    /* slider thumb */
+    input[type="range"]::-moz-range-thumb {
+        background-color: var(--slider-thumb-color);
+        border: none; /*Removes extra border that FF applies*/
+        border-radius: 0rem;
+        height: 3rem;
+        width: 4px;
+        margin-top: -5px; /* Centers thumb on the track */
+    }
+
+    input[type="range"]:focus::-moz-range-thumb {
+        outline: var(--slider-thumb-outline-width) solid var(--slider-thumb-outline-color);
+        outline-offset: var(--slider-thumb-outline-offset);
+    }

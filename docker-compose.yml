@@ -1,0 +1,17 @@
+# docker compose for local development
+services:
+  server:
+    build: ./src/WhatsMyWeatherWeb/
+    image: whats-my-weather-web:latest
+    restart: unless-stopped
+    environment:
+      - API_KEY_FILE=/run/secrets/api-key
+    ports:
+      - ${APP_PORT}:8080
+    secrets:
+      - api-key
+
+secrets:
+  api-key:
+    file: ./api-key.txt
+

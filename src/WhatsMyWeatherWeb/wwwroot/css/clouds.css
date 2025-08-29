@@ -1,0 +1,130 @@
+﻿#background-weather {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    min-height: 800px;
+    overflow: hidden;
+    z-index: -1;
+}
+
+
+
+@property --background-color-1 {
+  syntax: '<color>';
+  initial-value: #005573;
+  inherits: false;
+}
+
+@property --background-color-2 {
+  syntax: '<color>';
+  initial-value: #005573;
+  inherits: false;
+}
+
+body {
+    background: linear-gradient(0deg, var(--background-color-1) 0%,  var(--background-color-2) 100%);
+    transition: --background-color-1 2s, --background-color-2 2s;
+}
+
+    .default-background {
+        --background-color-1: #005573;
+        --background-color-2: #005573;
+    }
+
+    .Sunrise {
+        --background-color-1: #00051d;
+        --background-color-2: #76c3ff;
+    }
+
+    .Day {
+        --background-color-1: #ffffff;
+        --background-color-2: #50bdff;
+    }
+
+    .DarkDay {
+        --background-color-1: #2b2b2b;
+        --background-color-2: #2b4e64;
+    }
+
+    .Sunset {
+        --background-color-1: #00051d;
+        --background-color-2: #4780ad;
+    }
+
+    .Night {
+        --background-color-1: #00051d;
+        --background-color-2: #170050;
+    }
+
+
+
+
+    #background-weather > .cloud {
+        user-select: none;
+        position: absolute;
+        left: -300px;
+        transition-property: left;
+        transition-delay: 0s;
+        transition-timing-function: linear;
+        transition-duration: 10s; /* Will be overwritten by js */
+    }
+
+
+    #background-weather.Night > .cloud {
+        filter: brightness(0.5);
+    }
+
+
+    #background-weather.DarkDay > .cloud {
+        filter: brightness(0.8);
+    }
+
+
+
+    #background-weather > .precipitation {
+        opacity: 0;
+        width: 8px;
+        aspect-ratio: 1/1;
+        border-radius: 15px;
+        background-color: red;
+        z-index: -1;
+
+        user-select: none;
+        position: absolute;
+
+        transition: top 3s linear, opacity .5s linear;
+    }
+
+        #background-weather > .precipitation.rain {
+            background: #0051c2;
+        }
+
+        #background-weather > .precipitation.snow {
+            background: white;
+        }
+
+
+
+
+    #background-weather > .overlay,
+    #background-weather > .thunder {
+        position: absolute;
+        transition: opacity .7s linear;
+    }
+
+    #background-weather > .thunder {
+        left: 50%;
+        top: 50%;
+        z-index: -1;
+    }
+
+    #background-weather > .overlay {
+        inset: 0 0 0 0;
+    }
+
+        #background-weather > .overlay.flash {
+            transition-duration: .5s;
+            background: #ffffffb2;
+        }

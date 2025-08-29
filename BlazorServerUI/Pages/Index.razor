@@ -1,173 +1,0 @@
-﻿@page "/" @using BlazorServerUI.Data.GetWeatherHelperServiceModels; @using BlazorServerUI.Services; @using System.ComponentModel.DataAnnotations;
-@inject HttpClient http; @inject IJSRuntime js; @inject GetWeatherHelper weatherHelper   <HeadContent>
-    @{
-        string title = (Lang == "nl" ? "Wat wordt het weer?" : "What's my weather?") + " • sanderbrilman.nl";
-        string description = Lang == "nl" ? "Bekijk wat voor weer het vandaag wordt!" : "Check out what type of weather it will be today!";
-    }
-    <meta name="title" content="@(title)" />
-    <meta property="og:title" content="@(title)" />
-    <meta name="twitter:title" content="@(title)" />
-
-    <meta name="description" content="@(description)">
-    <meta property="og:description" content="@(description)" />
-    <meta name="twitter:description" content="@(description)" />
-
-    <meta property="og:image" content="/image.jfif" />
-    <meta name="twitter:image" content="/image.jfif" />
-    <meta property="og:image:alt" content="decorative image" />
-
-    <meta property="og:site_name" content="sanderbrilman.nl" />
-
-    <meta property="og:locale" content="@(Lang)_@(Lang!.ToUpper())" />
-    <meta property="og:type" content="website" />
-    <meta name="theme-color" content="#21E1E1" />
-
-    <link rel="apple-touch-icon" href="/image.jfif">
-    <link rel="apple-touch-startup-image" href="/image.jfif">
-</HeadContent>    @if (error is not null) {     <div role="alert">         @error     </div> }  <h1>     @(Lang == "nl"         ? "Wat wordt het weer?"         : "What's my weather?"     ) </h1>   <EditForm Model="location" OnValidSubmit="FetchWeather" >
-    <div class="input-container">
-        <div class="searchbar">
-            <input placeholder="Geef toegang tot je locatie of vul zelf een plaats in" @bind="location.Location" type="text" autocomplete="address-level2">             <button class="search" type="submit" title="Get weather from location"><i class="fa-solid fa-magnifying-glass"></i></button>             <button @onclick="GetLocationFromBrowser" class="reset" type="button" title="reset location"><i class="fa-regular fa-arrow-rotate-left"></i></button>         </div>
-        @if (resultFromApi is not null)
-        {
-            <div class="full-location">
-                @fullLocationTitle
-            </div>
-            <p class="time">@(selectedTime.Hour < 10 ? $"0{selectedTime.Hour}" : selectedTime.Hour):@(selectedTime.Minute < 10 ? $"0{selectedTime.Minute}" : selectedTime.Minute)</p>
-            <div class="slider">
-                    <DaytimeSlider SunriseStart="resultFromApi.SunriseStart"
-                                    SunriseDuration="resultFromApi.SunriseDuration"
-                                    SunsetStart="resultFromApi.SunsetStart"
-                                    SunsetDuration="resultFromApi.SunsetDuration"
-                                    CurrentTime="resultFromApi.LocalTime"
-                                    OnTimeSelect="SetSelectedWeather" />
-            </div>
-            <div class="slider-ticks">
-                <time style="left: 0%;">00</time>
-                <time style="left: 8.3%;">02</time>
-                <time style="left: 16.6%;">04</time>
-                <time style="left: 24.9%;">06</time>
-                <time style="left: 33.2%;">08</time>
-                <time style="left: 41.5%;">10</time>
-                <time style="left: 49.8%;">12</time>
-                <time style="left: 58.1%;">14</time>
-                <time style="left: 66.4%;">16</time>
-                <time style="left: 74.7%;">18</time>
-                <time style="left: 83%;">20</time>
-                <time style="left: 91.3%;">22</time>
-                <time style="left: 100%;">23</time>
-            </div>
-        }
-    </div> </EditForm>   @if (displayedWeatherState is not null)
-{
-    <div class="weatherStatus">
-        <h3>[ @displayedWeatherState.Status ]</h3>
-        <div>
-            <p>@displayedWeatherState.AverageTempInCelcius <span class="celcius">°C</span></p>
-            <p>@displayedWeatherState.PrecipitationInMM <span class="rain">mm</span></p>
-        </div>
-    </div>
-}   @code {
-
-    [Parameter, SupplyParameterFromQuery(Name = "lang")]
-    public string? Lang { get; set; }
-
-    class InputLocation
-    {
-        [Required(ErrorMessage = "Je moet dit wel invullen hè!")]
-        public string Location { get; set; } = "";
-    }
-
-    InputLocation location = new();
-
-    string fullLocationTitle;
-
-    string? error;
-
-
-    WeatherState? displayedWeatherState;
-    WeatherResult? resultFromApi;
-
-    DateTimeOffset selectedTime;
-    int currentHour;
-
-    bool weatherShouldRender = true;
-
-    protected override void OnInitialized()
-    {
-        Lang ??= "nl";
-    }
-
-
-    /// <summary>
-    /// Gets called by the DayTimeSlider component as a callback
-    /// </summary>
-    /// <param name="selectedTimeOfDay">the selected time of the day</param>
-    /// <returns></returns>
-    async Task SetSelectedWeather(DateTimeOffset selectedTimeOfDay)
-    {
-        if (resultFromApi is null)
-        {
-            return;
-        }
-
-        selectedTime = selectedTimeOfDay;
-        currentHour = selectedTimeOfDay.Hour;
-
-
-        WeatherState selectedWeatherState = resultFromApi.HourlyWeather[currentHour];
-
-        bool reRenderBackgroundWeather = true;//weatherShouldRender || displayedWeatherState is null || selectedWeatherState.Status != displayedWeatherState.Status;
-
-        displayedWeatherState = selectedWeatherState;
-
-        if (reRenderBackgroundWeather)
-        {
-            await SetBackgroundWeather();
-            weatherShouldRender = false;
-        }
-
-        StateHasChanged();
-    }
-
-    /// <summary>
-    /// Fetch weather result from service and d
-    /// </summary>
-    /// <returns></returns>
-    async Task FetchWeather()     {
-        weatherShouldRender = true;
-
-        if (location.Location == "") {
-            await GetLocationFromBrowser();
-            return;
-        }          try         {
-            resultFromApi = await weatherHelper.GetWeatherStatusForLocationAsync(location.Location, Lang);
-
-            if (resultFromApi is null)
-            {
-                error = "Kan het weer niet ophalen voor deze locatie!";
-                return;
-            }
-
-            selectedTime = resultFromApi.LocalTime;
-            currentHour = resultFromApi.LocalTime.Hour;
-
-            fullLocationTitle = resultFromApi.Location;
-
-            displayedWeatherState = resultFromApi.CurrentWeather;
-            await SetBackgroundWeather();
-
-            error = null;
-        }         catch (Exception ex)         {             error = "Er is iets mis gegaan bij het ophalen van het weer!";              #if DEBUG         error += " => " + ex.Message;             #endif         }         // to do     }        //     // getting location from browser functions     //          public async Task SetBackgroundWeather()     {         if (displayedWeatherState is null) {
-            return;         }          await js.InvokeVoidAsync("setBackgroundWeather", displayedWeatherState.WeatherGenerationOptions);     }      [JSInvokable]     public void GetLocationErrorCallback()     {         error = "Er ging iets mis bij het automatish invullen van je locatie, zorg dat je toestemming geeft voor locatie gebruik of vul zelf een plaats in";          StateHasChanged();     }      [JSInvokable]     public async Task GetLocationCallback(object latitude, object longitude)     {         location.Location = $"{latitude}, {longitude}";         await FetchWeather();         StateHasChanged();     }      async Task GetLocationFromBrowser() {
-        DateTimeOffset currentTime = DateTimeOffset.Now.ToOffset(TimeSpan.FromHours(2));
-
-        await js.InvokeVoidAsync("getLocation", DotNetObjectReference.Create(this));
-    }      protected override async Task OnAfterRenderAsync(bool firstRender)     {
-        if (firstRender is false)
-        {
-            return;
-        }
-
-        await GetLocationFromBrowser();
-    } }

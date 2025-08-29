@@ -1,0 +1,182 @@
+﻿<div 
+     class="currentPosition"
+     style="--left: @(calculatePercentageAsDouble(minutesInADay, currentTimeInMinutes))%;"
+     tabindex="-1"></div>
+
+<input 
+    aria-label="a slider selecting the current time of day"
+    type="range"
+
+    @bind="chosenSliderValue"
+    @bind:after="TriggerOnTimeSelect"
+    @bind:event="oninput"
+
+    min="0" 
+    max="@minutesInADay" 
+    
+    style="--slider-background: @GenerateCSSGradient();" 
+/>
+
+
+
+@code {
+    const int minutesInADay = 24 * 60;
+
+    [Parameter, EditorRequired]
+    public DateTimeOffset CurrentTime { get; set; }
+
+    [Parameter, EditorRequired]
+    public EventCallback<DateTimeOffset> OnTimeSelect { get; set; }
+
+
+
+    [Parameter, EditorRequired]
+    public DateTimeOffset SunriseStart { get; set; }
+
+    [Parameter, EditorRequired]
+    public TimeSpan SunriseDuration { get; set; }
+
+
+
+    [Parameter, EditorRequired]
+    public DateTimeOffset SunsetStart { get; set; }
+
+    [Parameter, EditorRequired]
+    public TimeSpan SunsetDuration { get; set; }
+
+
+    DateTimeOffset startOfDay;
+
+    protected override void OnParametersSet()
+    {
+        startOfDay = new DateTimeOffset(SunriseStart.Date, SunriseStart.Offset);
+
+        currentTimeInMinutes = (int)(CurrentTime - startOfDay).TotalMinutes;
+
+        @if (chosenSliderValue == 0)
+        {
+            chosenSliderValue = (int)currentTimeInMinutes;
+        }
+
+        StateHasChanged();
+    }
+
+    int currentTimeInMinutes;
+
+    int chosenSliderValue;
+    async Task TriggerOnTimeSelect()
+    {
+        DateTimeOffset selectedTimeOfDay = startOfDay.AddMinutes(chosenSliderValue);
+
+        await OnTimeSelect.InvokeAsync(selectedTimeOfDay);
+    }
+
+
+    double calculatePercentageAsDouble(int max, double current)
+    {
+        return 100 * current / max;
+    }
+
+    int calculatePercentage(int max, double current)
+    {
+        return (int)Math.Round(100 * current / max);
+    }
+
+    string GenerateCSSGradient()
+    {
+        const int transitionSpacePerSectionPercentage = 3;
+        const int totalSpaceNeededByTransitionPercentage = 4 * transitionSpacePerSectionPercentage;
+        const int aviliblePercentagesForSecions = 100 - totalSpaceNeededByTransitionPercentage;
+
+
+
+        int calculateRelativePercentageOfDay(TimeSpan current)
+        {
+            const int totalMinutesInADay = 23 * 60;
+
+            return calculatePercentage(totalMinutesInADay, current.TotalMinutes);
+        }
+
+
+        int convertToAbsolutePercentage(int relativePercentage)
+        {
+            return relativePercentage * aviliblePercentagesForSecions / 100;
+        }
+
+
+        // 
+        // calculate percentages per section. most of the variables can be directly used in method calls but are here for readability
+        //
+        // RelativePercentage is how much % of the available space reserved for the secions it will use
+        //
+        // AbsolutePercentage is how much % of the total space within the slider it will use.
+        //
+
+
+        TimeSpan firstNightPartDuration = SunriseStart - startOfDay;
+        int firstNightPartRelativePercentage = calculateRelativePercentageOfDay(firstNightPartDuration);
+
+
+        TimeSpan sunriseDuration = SunriseDuration;
+        int sunriseRelativePercentage = calculateRelativePercentageOfDay(sunriseDuration);
+
+
+        // calculate daylight time
+        TimeSpan daylightDuration = SunsetStart - SunriseStart.Add(SunriseDuration);
+        int daylightRelativePercentage = calculateRelativePercentageOfDay(daylightDuration);
+
+
+        TimeSpan sunsetDuration = SunsetDuration;
+        int sunsetRelativePercentage = calculateRelativePercentageOfDay(sunsetDuration);
+
+
+        int lastNightPartRelativePercentage = 100 - (firstNightPartRelativePercentage + sunriseRelativePercentage + daylightRelativePercentage + sunsetRelativePercentage);
+
+
+        //
+        // construct the linear gradient
+        //
+
+        List<KeyValuePair<string, int>> rgbColorSections = new()
+        {
+            new("#090331", firstNightPartRelativePercentage),
+            new("#386089",    sunriseRelativePercentage),
+            new("#5fc3ff",   daylightRelativePercentage),
+            new("#386089",     sunsetRelativePercentage),
+            new("#090331",  lastNightPartRelativePercentage),
+        };
+
+        string finalLinearGradient = "linear-gradient(90deg,";
+        int count = 1;
+        int percentageAccumulation = 0;
+
+        foreach (var colorSection in rgbColorSections)
+        {
+            // start of the section
+            finalLinearGradient += $"{colorSection.Key} {percentageAccumulation}%,";
+
+            // add size of the section
+            percentageAccumulation += convertToAbsolutePercentage(colorSection.Value);
+
+            // end of the section
+            finalLinearGradient += $"{colorSection.Key} {percentageAccumulation}%";
+
+            // add spacing for next section
+            percentageAccumulation += transitionSpacePerSectionPercentage;
+
+            // add comma if needed
+            if (rgbColorSections.Count != count)
+            {
+                finalLinearGradient += ",";
+            }
+
+            count++;
+        }
+
+        // add end bracket
+        finalLinearGradient += ")";
+
+        return finalLinearGradient;
+    }
+
+}

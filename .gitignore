@@ -361,3 +361,8 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+api-key.txt
+variables.yml
+inventory.ini
+.env

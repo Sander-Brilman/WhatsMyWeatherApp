@@ -1,0 +1,34 @@
+
+<HeadContent>
+    @{
+        string title = (Lang == "nl" ? "Wat wordt het weer?" : "What's my weather?") + " • sanderbrilman.nl";
+        string description = Lang == "nl" ? "Bekijk wat voor weer het vandaag wordt!" : "Check out what type of weather it will be today!";
+    }
+    <meta name="title" content="@title" />
+    <meta property="og:title" content="@title" />
+    <meta name="twitter:title" content="@title" />
+
+    <meta name="description" content="@description">
+    <meta property="og:description" content="@description" />
+    <meta name="twitter:description" content="@description" />
+
+    <meta property="og:image" content="/image.jfif" />
+    <meta name="twitter:image" content="/image.jfif" />
+    <meta property="og:image:alt" content="decorative image" />
+
+    <meta property="og:site_name" content="sanderbrilman.nl" />
+
+    <meta property="og:locale" content="@(Lang)_@(Lang!.ToUpper())" />
+    <meta property="og:type" content="website" />
+    <meta name="theme-color" content="#21E1E1" />
+
+    <link rel="apple-touch-icon" href="/image.jfif">
+    <link rel="apple-touch-startup-image" href="/image.jfif">
+</HeadContent>
+
+@code {
+
+    [Parameter, EditorRequired]
+    public required string Lang { get; set; }
+
+}

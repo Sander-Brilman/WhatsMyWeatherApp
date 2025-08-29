@@ -1,0 +1,139 @@
+
+- name: "create {{ APP_USER }} user"
+  tags: create_user
+  hosts: all
+  become: true
+  vars_files:
+    - ./variables.yml
+  tasks:
+    - name: "create {{ APP_USER }} group"
+      group:
+        name: "{{ APP_USER }}"
+        state: present
+
+    - name: create {{ APP_USER }} user 
+      user:
+        name: "{{ APP_USER }}"
+        comment: user for running the shoppinglist api docker compose
+        create_home: true # we will place the app here!
+        groups: "{{ APP_USER }},docker"
+        state: present
+        shell: /usr/sbin/nologin
+        password: '!'
+
+    - name: set permissions of app home
+      file: 
+        path: "/home/{{ APP_USER }}/"
+        state: directory
+        owner: "{{ APP_USER }}"
+        group: restic
+        mode: u=rx,g=rx,o=
+
+
+- name: build the docker container
+  tags: build_container
+  hosts: localhost
+  tasks:
+    - name: remove existing .tar
+      file:
+        path: ../../whats-my-weather-web-container.tar
+        state: absent
+
+    - name: build docker image
+      command: docker compose build
+      args:
+        chdir: ../../
+
+    - name: Save Docker image to tarball
+      command: docker save whats-my-weather-web:latest -o whats-my-weather-web-container.tar
+      args:
+        chdir: ../../
+
+
+- name: Install and run app 
+  tags: run_container
+  hosts: all
+  become: true
+  vars_files:
+  - ./variables.yml
+  tasks:
+    - name: Copy Docker files
+      copy:
+        src: "{{ item.src }}"
+        dest: "/home/{{ APP_USER }}/{{ item.dest }}"
+        owner: "{{ APP_USER }}"
+        group: restic
+        mode: u=r,g=r,o=
+        force: true
+      loop:
+        - { src: "../../whats-my-weather-web-container.tar", dest: whats-my-weather-web-container.tar }
+
+    - name: template docker-compose file
+      template:
+        src: docker-compose.yml.j2
+        dest: "/home/{{ APP_USER }}/docker-compose.yml"
+        owner: "{{ APP_USER }}"
+        group: restic
+        mode: u=r,g=r,o=
+        force: true
+
+    - name: template api key file
+      template:
+        src: api-key.txt.j2
+        dest: "/home/{{ APP_USER }}/api-key.txt"
+        owner: 1654 # user from the dotnet image
+        group: restic
+        mode: u=r,g=r,o=
+        force: true
+
+
+
+    - name: Load image into Docker
+      command: sudo docker load -i /home/{{ APP_USER }}/whats-my-weather-web-container.tar
+
+    - name: Stop running containers
+      command: sudo docker compose down 
+      args:
+        chdir: "/home/{{ APP_USER }}/"
+
+    - name: Start container
+      command: sudo docker-compose up -d
+      args:
+        chdir: "/home/{{ APP_USER }}/"
+
+
+- name: setup caddy reverse proxy
+  tags: caddy
+  hosts: all
+  become: true
+  vars_files:
+    - ./variables.yml
+  tasks:
+    - name: template reverse proxy caddy file
+      template:
+        src: caddyfile.j2
+        dest: "/etc/caddy/sites/{{ APP_USER }}.caddyfile"
+        owner: caddy
+        group: restic
+        mode: u=r,g=r,o=
+
+    - name: restart Caddy service
+      command: sudo caddy reload --config /etc/caddy/Caddyfile
+
+
+
+- name: configure backup paths
+  tags: configure_backup
+  hosts: all
+  become: true
+  vars_files:
+    - ./variables.yml
+  tasks:
+    - name: template backup locations file
+      template:
+        src: backup-locations.txt.j2
+        dest: "/etc/restic/{{ APP_USER }}.txt"
+        owner: restic
+        group: restic
+        mode: u=r,g=,o=
+
