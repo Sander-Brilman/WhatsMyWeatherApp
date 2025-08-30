@@ -25,7 +25,7 @@
 <h1>@(Lang == "nl" ? "Wat wordt het weer?" : "What's my weather?")</h1>
 
 
-<EditForm Model="location" OnValidSubmit="FetchWeather" >
+<EditForm Model="location" OnSubmit="FetchWeather" >
 
 
     <div class="input-container">
@@ -152,12 +152,10 @@
     {
         weatherShouldRender = true;
 
-        if (location.LocationText.Trim().Length > 0) {
-            return;
+        if (location.LocationText.Trim().Length == 0) {
+            LocationResult result = await locationService.GetLocationFromBrowser();
+            location.LocationText = $"{result.Latitude} {result.Longitude}";
         }
-        
-        LocationResult result = await locationService.GetLocationFromBrowser();
-        location.LocationText = $"{result.Latitude} {result.Longitude}";
         
         try
         {   
@@ -202,6 +200,7 @@
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender) {// automatically start requesting the location once the page is loaded
+        
             await FetchWeather();
         }
     }

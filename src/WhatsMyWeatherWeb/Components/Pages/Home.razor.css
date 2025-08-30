@@ -8,16 +8,16 @@
 
 
 h1 {
-    margin-bottom: 3rem;
-    font-size: 2.5rem;
+    font-size: 2rem;
     text-shadow: 3px 3px #0000005c;
-    padding-bottom: 20px;
     border-bottom: white solid 2px;
     text-align: center;
     color: white;
+    margin: 0;
+    padding-top: 1em;
+    padding-bottom: 1em;
+    margin-bottom: 1em;
 }
-
-
 
 .input-container {
     padding: 15px;

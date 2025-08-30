@@ -1,5 +1,6 @@
 services:
   server:
+    user: {{ USER_ID }}:{{ USER_GROUP_ID }}
     image: whats-my-weather-web:latest
     restart: unless-stopped
     environment:
